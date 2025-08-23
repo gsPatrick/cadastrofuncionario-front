@@ -1,6 +1,6 @@
 // utils/api.js
 
-export const API_BASE_URL = 'http://localhost:3000/api';
+export const API_BASE_URL = 'https://n8n-cadastrofuncionario-api.r954jc.easypanel.host//api';
 
 /**
  * Obtém o token de autenticação do localStorage.
