@@ -3,7 +3,7 @@
 
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import EmployeeForm from '../../../../components/EmployeeForm/EmployeeForm';
+import EmployeeForm from '../../components/EmployeeForm/EmployeeForm';
 import styles from '../../../../styles/FormPage.module.css'; // Reutilizando o estilo genérico
 
 // Reutilizando os mesmos dados fictícios do sistema
