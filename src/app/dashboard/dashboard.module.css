@@ -1,0 +1,259 @@
+/* app/dashboard/dashboard.module.css */
+
+/* Container Principal da Página */
+.container {
+  padding: 2rem;
+  background-color: var(--cor-cinza-claro);
+  min-height: 100vh;
+}
+
+/* Header do Dashboard */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.title {
+  color: var(--cor-azul-escuro);
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex-grow: 1;
+}
+
+.addButton, .exportButton, .filterButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.addButton { background-color: var(--cor-azul-claro); color: var(--cor-branco); }
+.addButton:hover { background-color: #3a7bc8; transform: translateY(-2px); }
+
+.exportButton { background-color: var(--cor-branco); color: var(--cor-azul-escuro); border: 1px solid #ddd; }
+.exportButton:hover { background-color: #fdfdfd; border-color: #ccc; }
+
+.filterButton { background-color: var(--cor-verde); color: var(--cor-branco); }
+.filterButton:hover { background-color: #345a2e; }
+
+
+/* Card de Conteúdo Principal */
+.contentCard {
+  background-color: var(--cor-branco);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* --- NOVA ÁREA DE FILTROS --- */
+.filtersWrapper {
+  margin-bottom: 2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: #fcfcfc;
+}
+
+.filtersHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.filtersHeader h3 {
+    margin: 0;
+    color: var(--cor-azul-escuro);
+}
+
+.clearFiltersButton {
+    background: none;
+    border: 1px solid #ddd;
+    color: var(--cor-cinza-escuro);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s;
+}
+
+.clearFiltersButton:hover {
+    background-color: var(--cor-vermelho);
+    color: var(--cor-branco);
+    border-color: var(--cor-vermelho);
+}
+
+
+.filtersGrid {
+  display: grid;
+  /* Cria colunas responsivas, cada uma com no mínimo 220px */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.filterInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterInputGroup label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.filterInput {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.filterInput:focus {
+    outline: none;
+    border-color: var(--cor-azul-claro);
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+
+/* --- NOVA TABELA COM SCROLL --- */
+.tableWrapper {
+  overflow-x: auto; /* ESSENCIAL para a tabela larga */
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  min-width: 3000px; /* Largura mínima para forçar o scroll e evitar quebra de layout */
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e9e9e9;
+  vertical-align: middle;
+  white-space: nowrap; /* Impede que o texto quebre para a próxima linha */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adiciona "..." se o texto for muito longo */
+  max-width: 250px; /* Largura máxima para evitar colunas excessivamente largas */
+}
+
+.table thead {
+  background-color: #fafafa;
+  position: sticky; /* Mantém o cabeçalho fixo no topo durante o scroll vertical */
+  top: 0;
+  z-index: 10;
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--cor-azul-escuro);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.table tbody tr:hover {
+  background-color: var(--cor-cinza-claro);
+}
+
+.actionsCell {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  position: sticky; /* Mantém a coluna de ações fixa na direita */
+  right: 0;
+  background-color: #fff; /* Fundo para sobrepor o conteúdo que rola por baixo */
+}
+/* Adiciona uma sombra para indicar que há conteúdo rolando por baixo da coluna de ações */
+.table tbody tr:hover .actionsCell {
+    background-color: var(--cor-cinza-claro);
+}
+
+.actionIcon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--cor-cinza-escuro);
+  font-size: 1.1rem;
+  transition: color 0.2s;
+}
+
+.actionIcon:hover {
+  color: var(--cor-azul-claro);
+}
+
+.noData {
+    text-align: center;
+    padding: 3rem;
+    color: var(--cor-cinza-escuro);
+    font-size: 1.1rem;
+}
+
+
+/* Paginação */
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+}
+
+/* Menu de Exportação (Dropdown) */
+.exportContainer { position: relative; display: inline-block; }
+.exportMenu {
+  position: absolute;
+  top: 100%; 
+  right: 0;
+  background-color: var(--cor-branco);
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-width: 180px; 
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+}
+.exportMenu button { background: none; border: none; padding: 0.75rem 1.25rem; text-align: left; cursor: pointer; font-size: 0.9rem; color: var(--cor-cinza-escuro); }
+.exportMenu button:hover { background-color: var(--cor-cinza-claro); }
+
+/* --- Media Queries --- */
+@media (max-width: 768px) {
+    .container { padding: 1rem; }
+    .header { flex-direction: column; align-items: stretch; gap: 1rem; }
+    .title { text-align: center; }
+    .actions { width: 100%; justify-content: space-around; }
+    .addButton, .exportButton, .filterButton { flex-grow: 1; justify-content: center; }
+}

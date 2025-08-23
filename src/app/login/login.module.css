@@ -1,0 +1,106 @@
+/* app/login/login.module.css */
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--cor-cinza-claro);
+  padding: 1rem;
+}
+
+.formWrapper {
+  width: 100%;
+  max-width: 400px;
+  padding: 2.5rem;
+  background-color: var(--cor-branco);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.title {
+  color: var(--cor-azul-escuro);
+  margin-bottom: 2rem;
+  font-size: 1.5rem;
+  font-weight: 700; /* Corresponde a 'bold' */
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.9rem;
+  font-weight: 600; /* Sans-serif regular/boldish */
+}
+
+.inputGroup input {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: var(--font-sans-serif);
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: var(--cor-azul-claro);
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordWrapper input {
+  width: 100%;
+}
+
+.eyeIcon {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  color: var(--cor-cinza-escuro);
+  font-size: 1.2rem;
+}
+
+.button {
+  padding: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--cor-azul-claro);
+  color: var(--cor-branco);
+  font-size: 1rem;
+  font-weight: 600; /* Sans-serif regular/boldish */
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  margin-top: 1rem;
+}
+
+.button:hover {
+  background-color: #3a7bc8; /* Um tom um pouco mais escuro do azul-claro */
+}
+
+.link {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: var(--cor-cinza-escuro);
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+.link:hover {
+  color: var(--cor-azul-claro);
+}

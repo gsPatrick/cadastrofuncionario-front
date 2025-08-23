@@ -1,0 +1,105 @@
+/* components/EmployeeForm/EmployeeForm.module.css */
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.fieldset {
+    border: 1px solid #e0e0e0;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.legend {
+    padding: 0 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--cor-azul-escuro);
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Chave para a responsividade dos formulários */
+.grid2Cols, .grid3Cols {
+    display: grid;
+    gap: 1.5rem;
+}
+
+/* Em telas de desktop, cria 2 colunas. Em mobile, vira 1 coluna. */
+.grid2Cols {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* Em telas de desktop, cria 3 colunas. Em mobile, vira 1 coluna. */
+.grid3Cols {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+
+.inputGroup label {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroup textarea {
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit; /* Garante que a fonte seja a mesma do resto do app */
+}
+
+.inputGroup input:focus,
+.inputGroup select:focus,
+.inputGroup textarea:focus {
+    outline: none;
+    border-color: var(--cor-azul-claro);
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+}
+
+.saveButton, .cancelButton {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.saveButton {
+    background-color: var(--cor-azul-claro);
+    color: var(--cor-branco);
+}
+
+.saveButton:hover {
+    background-color: #3a7bc8;
+}
+
+.cancelButton {
+    background-color: var(--cor-cinza-claro);
+    color: var(--cor-cinza-escuro);
+    border: 1px solid #ddd;
+}
+
+.cancelButton:hover {
+    background-color: #e9e9e9;
+}

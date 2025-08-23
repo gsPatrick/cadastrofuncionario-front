@@ -1,0 +1,147 @@
+/* app/recuperar-senha/recuperar-senha.module.css */
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - var(--footer-height, 2.5rem)); /* Considera a altura do footer fixo */
+  background-color: var(--cor-cinza-claro);
+  padding: 1rem;
+}
+
+.formWrapper {
+  width: 100%;
+  max-width: 450px; /* Um pouco maior que o login para o texto */
+  padding: 2.5rem;
+  background-color: var(--cor-branco);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.title {
+  color: var(--cor-azul-escuro);
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.description {
+  color: var(--cor-cinza-escuro);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.inputGroup input {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: var(--font-sans-serif);
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: var(--cor-azul-claro);
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.inputGroup input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.message {
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-top: -0.5rem; /* Ajuste para não ter muito espaço do input */
+  text-align: center;
+}
+
+.success {
+  background-color: #e6f7ec;
+  color: var(--cor-verde);
+  border: 1px solid var(--cor-verde);
+}
+
+.error {
+  background-color: #fff5f5;
+  color: var(--cor-vermelho);
+  border: 1px solid var(--cor-vermelho);
+}
+
+
+.button {
+  padding: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--cor-azul-claro);
+  color: var(--cor-branco);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  margin-top: 1rem;
+  display: flex; /* Para centralizar o spinner */
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button:hover:not(:disabled) {
+  background-color: #3a7bc8;
+}
+
+.button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.link {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: var(--cor-cinza-escuro);
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+.link:hover {
+  color: var(--cor-azul-claro);
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .formWrapper {
+    padding: 1.5rem;
+  }
+  .title {
+    font-size: 1.5rem;
+  }
+  .description {
+    font-size: 0.85rem;
+  }
+  .button {
+    font-size: 0.9rem;
+    padding: 0.8rem;
+  }
+}

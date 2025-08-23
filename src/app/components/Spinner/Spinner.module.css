@@ -1,0 +1,15 @@
+/* components/Spinner/Spinner.module.css */
+.spinner {
+  display: inline-block;
+  width: var(--spinner-size, 24px);
+  height: var(--spinner-size, 24px);
+  border: var(--spinner-border-width, 3px) solid rgba(255, 255, 255, 0.3); /* Cor transparente para o fundo */
+  border-radius: 50%;
+  border-top-color: var(--spinner-color, #fff); /* Cor visível do spinner */
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

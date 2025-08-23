@@ -1,0 +1,426 @@
+/* app/gerenciar-usuarios/gerenciar.module.css - Nova Versão */
+
+.pageContainer {
+  padding: 2rem;
+  background-color: var(--cor-branco);
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header da Página */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pageTitle {
+  color: var(--cor-azul-escuro);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.addUserBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--cor-azul-claro);
+  color: var(--cor-branco);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.addUserBtn:hover {
+  background-color: #3a7bc8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Container Principal */
+.mainContent {
+  background-color: var(--cor-branco);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* Grid de Usuários (Mobile) */
+.usersGrid {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.userCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.userCard:hover {
+  background-color: #f0f0f0;
+  border-color: var(--cor-azul-claro);
+}
+
+.userInfo {
+  flex: 1;
+}
+
+.userDetails {
+  margin-bottom: 1rem;
+}
+
+.userName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--cor-azul-escuro);
+  margin: 0 0 0.25rem 0;
+}
+
+.userLogin {
+  font-size: 0.85rem;
+  color: var(--cor-cinza-escuro);
+  margin: 0 0 0.5rem 0;
+}
+
+.userEmail {
+  font-size: 0.9rem;
+  color: var(--cor-cinza-escuro);
+  margin: 0;
+}
+
+.userPermissions {
+  margin-top: 1rem;
+}
+
+.permissionsLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cor-azul-escuro);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.permissionsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.permissionBadge {
+  background-color: var(--cor-cinza-claro);
+  color: var(--cor-cinza-escuro);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #ddd;
+}
+
+.userActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+
+.editBtn, .deleteBtn {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editBtn {
+  background-color: #f8f9fa;
+  color: var(--cor-cinza-escuro);
+}
+
+.editBtn:hover {
+  background-color: var(--cor-azul-claro);
+  color: var(--cor-branco);
+}
+
+.deleteBtn {
+  background-color: #f8f9fa;
+  color: var(--cor-cinza-escuro);
+}
+
+.deleteBtn:hover {
+  background-color: #dc3545;
+  color: var(--cor-branco);
+}
+
+/* Tabela (Desktop) */
+.tableContainer {
+  display: block;
+}
+
+.tableHeader {
+  display: flex;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.headerCell {
+  padding: 1rem;
+  font-weight: 600;
+  color: var(--cor-azul-escuro);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-right: 1px solid #e9ecef;
+}
+
+.headerCell:last-child {
+  border-right: none;
+  text-align: center;
+}
+
+.tableBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.tableRow {
+  display: flex;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+  background-color: var(--cor-cinza-claro);
+}
+
+.tableCell {
+  padding: 1rem;
+  border-right: 1px solid #e9ecef;
+  display: flex;
+  align-items: flex-start;
+}
+
+.tableCell:last-child {
+  border-right: none;
+  justify-content: center;
+}
+
+.cellContent {
+  width: 100%;
+}
+
+.loginText {
+  font-size: 0.85rem;
+  color: var(--cor-cinza-escuro);
+}
+
+.permissionsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.permissionTag {
+  background-color: var(--cor-cinza-claro);
+  color: var(--cor-cinza-escuro);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #ddd;
+}
+
+.actionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.actionButton {
+  padding: 0.5rem;
+  background: none;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--cor-cinza-escuro);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actionButton:hover {
+  background-color: var(--cor-azul-claro);
+  color: var(--cor-branco);
+  border-color: var(--cor-azul-claro);
+}
+
+/* Paginação */
+.paginationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+}
+
+.paginationInfo {
+  font-size: 0.9rem;
+  color: var(--cor-cinza-escuro);
+  font-weight: 500;
+}
+
+.paginationControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pageButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e9ecef;
+  background-color: var(--cor-branco);
+  color: var(--cor-cinza-escuro);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pageButton:hover:not(:disabled) {
+  background-color: var(--cor-azul-claro);
+  color: var(--cor-branco);
+  border-color: var(--cor-azul-claro);
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e9ecef;
+  background-color: var(--cor-branco);
+  color: var(--cor-cinza-escuro);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.pageNumber:hover {
+  background-color: var(--cor-azul-claro);
+  color: var(--cor-branco);
+  border-color: var(--cor-azul-claro);
+}
+
+.pageNumberActive {
+  background-color: var(--cor-azul-claro);
+  color: var(--cor-branco);
+  border-color: var(--cor-azul-claro);
+  font-weight: 600;
+}
+
+.pageNumberActive:hover {
+  background-color: #3a7bc8;
+  border-color: #3a7bc8;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 1rem;
+  }
+
+  .pageHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pageTitle {
+    font-size: 1.75rem;
+    text-align: center;
+  }
+
+  .addUserBtn {
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* Mostra grid no mobile */
+  .usersGrid {
+    display: flex;
+  }
+
+  /* Esconde tabela no mobile */
+  .tableContainer {
+    display: none;
+  }
+  .paginationContainer {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .paginationInfo {
+    text-align: center;
+  }
+
+  .paginationControls {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .userCard {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .userActions {
+    flex-direction: row;
+    justify-content: center;
+    margin-left: 0;
+  }
+
+  .permissionBadge, .permissionTag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+  }
+}

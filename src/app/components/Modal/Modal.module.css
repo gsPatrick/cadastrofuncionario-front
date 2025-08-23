@@ -1,0 +1,66 @@
+/* components/Modal/Modal.module.css */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  /* Garante a rolagem em telas pequenas se o modal for maior que a tela */
+  overflow-y: auto; 
+}
+
+.content {
+  background-color: var(--cor-branco);
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  
+  /* Chave para o layout "quadrado" e responsivo */
+  max-width: 700px; /* Largura máxima em desktops, permitindo espaço para as colunas do form */
+
+  display: flex;
+  flex-direction: column;
+  /* Impede que o modal fique maior que a tela */
+  max-height: 90vh; 
+}
+
+.header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  /* Impede que o header encolha */
+  flex-shrink: 0; 
+}
+
+.title {
+  color: var(--cor-azul-escuro);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--cor-cinza-escuro);
+  padding: 0.5rem;
+}
+
+.closeButton:hover {
+  color: var(--cor-vermelho);
+}
+
+.body {
+  padding: 1.5rem;
+  /* Permite que o corpo do modal role se o conteúdo for grande */
+  overflow-y: auto; 
+}

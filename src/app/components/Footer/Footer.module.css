@@ -1,0 +1,55 @@
+/* components/Footer/Footer.module.css */
+
+.footer {
+  position: fixed; /* Essencial: fixa o rodapé na tela */
+  bottom: 0; /* Alinha na parte inferior da viewport */
+  left: 0;
+  width: 100%; /* Ocupa toda a largura */
+  background-color: var(--cor-azul-escuro); /* Cor de fundo */
+  color: var(--cor-branco); /* Cor do texto */
+  padding: 0.5rem 1rem; /* Padding mínimo para uma barra fina */
+  z-index: 1000; /* Garante que ele fique por cima de outros elementos */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Sombra sutil na parte superior */
+  flex-shrink: 0; /* Impede que o footer encolha em layouts flex */
+}
+
+.footerContent {
+  max-width: 1280px; /* Alinha com a largura máxima do conteúdo principal */
+  margin: 0 auto; /* Centraliza o conteúdo dentro do rodapé */
+  display: flex;
+  justify-content: space-between; /* Espaça o copyright e a data/hora */
+  align-items: center;
+  font-size: 0.85rem; /* Fonte menor para a barra fina */
+  width: 100%; /* Ocupa a largura total do max-width container */
+}
+
+.copyright {
+  white-space: nowrap; /* Impede quebra de linha para o copyright */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adiciona "..." se o texto for muito longo */
+}
+
+.dateTime {
+  font-weight: 600; /* Data e hora em negrito */
+  white-space: nowrap; /* Impede quebra de linha para data/hora */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adiciona "..." se o texto for muito longo */
+}
+
+/* --- Media Queries para Responsividade --- */
+@media (max-width: 768px) {
+  .footerContent {
+    flex-direction: column; /* Empilha o copyright e a data/hora em telas menores */
+    text-align: center;
+    gap: 0.25rem; /* Espaçamento entre os itens empilhados */
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding: 0.4rem 0.75rem; /* Ajuste ainda menor para telas muito pequenas */
+  }
+  .footerContent {
+    font-size: 0.75rem; /* Fonte ainda menor em celulares */
+  }
+}

@@ -1,0 +1,32 @@
+/* styles/FormPage.module.css */
+.container {
+  padding: 2rem;
+  background-color: var(--cor-cinza-claro);
+  min-height: 100vh;
+}
+
+.formWrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: var(--cor-branco);
+  padding: 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.backLink {
+    font-size: 0.9rem;
+    color: var(--cor-azul-claro);
+    margin-bottom: 0.5rem;
+    display: inline-block;
+}
+
+.title {
+    color: var(--cor-azul-escuro);
+    font-size: 2rem;
+    margin: 0;
+}

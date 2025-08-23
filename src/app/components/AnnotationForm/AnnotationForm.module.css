@@ -1,0 +1,9 @@
+/* components/AnnotationForm/AnnotationForm.module.css */
+.form { display: flex; flex-direction: column; gap: 1.5rem; }
+.inputGroup { display: flex; flex-direction: column; gap: 0.5rem; }
+.inputGroup label { font-weight: 600; }
+.inputGroup input, .inputGroup textarea { padding: 0.8rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; font-family: inherit; }
+.buttonContainer { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
+.saveButton, .cancelButton { padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+.saveButton { background-color: var(--cor-azul-claro); color: var(--cor-branco); }
+.cancelButton { background-color: var(--cor-cinza-claro); color: var(--cor-cinza-escuro); }
