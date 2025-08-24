@@ -4,7 +4,7 @@
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import EmployeeForm from '../../funcionarios/novo/FormPage.module.css';
-import styles from '../../components'; // Reutilizando o estilo genérico
+import styles from '../../funcionarios/novo/FormPage.module.css'; // Reutilizando o estilo genérico
 
 // Reutilizando os mesmos dados fictícios do sistema
 const MOCK_FUNCIONARIOS = [
