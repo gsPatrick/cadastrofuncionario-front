@@ -1,7 +1,7 @@
 // utils/api.js
 
 export const API_BASE_URL = 'https://n8n-cadastrofuncionario-api.r954jc.easypanel.host/api';
-
+//teste
 /**
  * Obtém o token de autenticação do localStorage.
  * @returns {string|null} O token JWT ou nulo se não existir.
