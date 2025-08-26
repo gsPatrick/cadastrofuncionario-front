@@ -1,535 +1,285 @@
 /* app/funcionarios/[id]/details.module.css */
 
-/* Container Principal da Página */
-.container {
-    padding: 2rem;
-    max-width: 1100px; /* Largura máxima do conteúdo */
-    margin: 0 auto; /* Centraliza na tela */
+.pageContainer {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* Header da Página (Nome do Funcionário, Botões de Ação) */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start; /* Alinha os itens ao topo */
-    border-bottom: 1px solid #e0e0e0; /* Linha divisória */
-    padding-bottom: 1.5rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha em telas menores */
-    gap: 1rem; /* Espaçamento entre os blocos (nome e ações) */
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  font-size: 1.2rem;
 }
 
-.backLink {
-    font-size: 0.9rem;
-    color: var(--cor-azul-claro);
-    margin-bottom: 0.5rem;
-    display: inline-block;
-    text-decoration: none;
-}
-.backLink:hover {
-    text-decoration: underline;
+.errorText {
+  color: var(--cor-vermelho);
 }
 
-.title {
-    color: var(--cor-azul-escuro);
-    font-size: 2.5rem; /* Tamanho padrão para desktop */
-    margin: 0;
+/* Profile Header */
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background-color: var(--cor-branco);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+  flex-wrap: wrap; /* Permite quebrar linha em telas menores */
 }
 
-.subtitle {
-    font-size: 1.1rem;
-    color: var(--cor-cinza-escuro);
-    margin-top: 0.25rem;
+.profileAvatar {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: var(--cor-cinza-claro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cor-azul-escuro);
+  border: 2px solid var(--cor-azul-claro);
 }
 
-.actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem; /* Espaçamento para o nome em telas maiores */
-    flex-wrap: wrap; /* Permite que os botões quebrem para a próxima linha */
-    justify-content: flex-end; /* Alinha os botões à direita no container */
+.profileInfo {
+  flex-grow: 1; /* Faz com que o nome ocupe o espaço disponível */
 }
 
-.editButton, .deleteButton {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.7rem 1.2rem;
-    border-radius: 6px;
-    border: none;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
+.profileName {
+  color: var(--cor-azul-escuro);
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
 }
 
-.editButton {
-    background-color: var(--cor-azul-claro);
-    color: var(--cor-branco);
+.profileMeta {
+  color: var(--cor-cinza-escuro);
+  font-size: 1rem;
 }
 
-.editButton:hover {
-    background-color: #3a7bc8;
-}
-
-.deleteButton {
-    background-color: transparent;
-    color: var(--cor-vermelho);
-    border: 1px solid var(--cor-vermelho);
-}
-
-.deleteButton:hover {
-    background-color: #fff5f5;
-}
-
-/* Navegação por Abas */
-.tabNav {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid #e0e0e0;
-    overflow-x: auto; /* Permite rolagem horizontal se as abas não couberem */
-    -webkit-overflow-scrolling: touch; /* Suaviza a rolagem em iOS */
-    white-space: nowrap; /* Impede que o texto das abas quebre */
+/* Tabs */
+.tabsNav {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 2rem;
 }
 
 .tabButton, .tabButtonActive {
-    padding: 0.8rem 1.5rem;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 1rem;
-    border-bottom: 3px solid transparent;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--cor-cinza-escuro);
-    transition: all 0.2s;
-    flex-shrink: 0; /* Impede que as abas encolham mais do que o conteúdo */
+  padding: 1rem 1.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cor-cinza-escuro);
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .tabButton:hover {
-    background-color: var(--cor-cinza-claro);
+  background-color: var(--cor-cinza-claro);
 }
 
 .tabButtonActive {
-    border-bottom: 3px solid var(--cor-azul-claro);
-    color: var(--cor-azul-escuro);
-    font-weight: 600;
+  color: var(--cor-azul-claro);
+  border-bottom-color: var(--cor-azul-claro);
 }
 
-/* Conteúdo das Abas */
 .tabContent {
-    background-color: var(--cor-branco);
-    padding: 2rem;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
+  background-color: var(--cor-branco);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-/* Estilos para o conteúdo da aba de Informações Cadastrais */
-.infoContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
+/* Details Tab */
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
-.infoSection {
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 1.5rem;
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background-color: #fafafa;
+  border-radius: 6px;
+  border-left: 4px solid var(--cor-azul-claro);
+  word-break: break-word; /* Garante que textos longos quebrem a linha */
 }
 
-.infoSection:last-child {
-    border-bottom: none;
+.detailLabel {
+  font-size: 0.8rem;
+  color: var(--cor-cinza-escuro);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
 }
 
-.sectionTitle {
-    color: var(--cor-azul-escuro);
-    font-size: 1.2rem;
-    margin-bottom: 1.5rem;
+.detailValue {
+  font-size: 1rem;
+  font-weight: 500;
 }
 
-/* Grid responsivo para informações: 250px por coluna, quebra se não houver espaço */
-.infoGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-    gap: 1rem 2rem; /* Espaçamento vertical e horizontal */
-    line-height: 1.6;
+/* Documents & Annotations Tabs */
+.contentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
 }
 
-.infoLabel {
-    font-weight: 600;
-    color: var(--cor-cinza-escuro);
-    margin-right: 0.5rem;
+.actionButton {
+  background-color: var(--cor-azul-claro);
+  color: var(--cor-branco);
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
 }
-
-/* Estilos para as listas de Documentos e Anotações */
-.listControls {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 1rem;
-}
-
-.listAddButton {
-    background-color: var(--cor-verde);
-    color: white;
-    border: none;
-    padding: 0.6rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.actionButton:hover {
+  background-color: #3a7bc8;
 }
 
 .list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .listItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background-color: var(--cor-cinza-claro);
-    border-radius: 6px;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.listItem:hover {
+  border-color: var(--cor-azul-claro);
+  background-color: #fcfcfc;
 }
 
-/* Estilo para a área de texto clicável dentro do item da lista (Documento ou Anotação) */
-.listItemTextContent,
-.noteItemContent {
-    flex-grow: 1; 
-    cursor: pointer;
-    padding-right: 1rem;
-    overflow: hidden; 
-    text-overflow: ellipsis;
-    white-space: nowrap; /* Mantém o texto em uma única linha, aplicando ellipsis */
+.listIcon {
+  color: var(--cor-azul-claro);
+  font-size: 1.5rem;
+  margin-top: 0.25rem;
 }
 
-.listItemTextContent:hover,
-.noteItemContent:hover {
-    text-decoration: underline;
-    color: var(--cor-azul-claro);
+.listItemContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  word-break: break-word;
+}
+.listItemContent strong {
+  color: var(--cor-azul-escuro);
+}
+.listItemContent small {
+  color: var(--cor-cinza-escuro);
+  font-size: 0.8rem;
 }
 
 .listItemActions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    /* Adicionado para responsividade nos botões de ação do item */
-    flex-shrink: 0; /* Impede que os botões encolham */
+  display: flex;
+  gap: 0.5rem;
 }
 
-/* Estilos específicos para o item de anotação na lista */
-.noteItem {
-    flex-direction: column; 
-    align-items: flex-start;
+.editButton, .deleteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.editButton:hover { color: var(--cor-branco); background-color: var(--cor-amarelo); }
+.deleteButton:hover { color: var(--cor-branco); background-color: var(--cor-vermelho); }
+
+.emptyState {
+  text-align: center;
+  padding: 2rem;
+  color: var(--cor-cinza-escuro);
 }
 
-.noteHeader { width: 100%; }
-.noteContent { margin: 0.75rem 0; color: #555; }
-
-/* Preview do conteúdo da anotação na lista (limita o texto) */
-.noteContentPreview {
-    font-size: 0.9em;
-    color: #777;
-    max-height: 2.5em; 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; 
+/* History Tab */
+.historyTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+.historyTable th, .historyTable td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e9e9e9;
+}
+.historyTable th {
+  background-color: #fafafa;
+  font-weight: 600;
 }
 
-.noteFooter {
-    width: 100%; 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.8rem;
-    color: #777;
-    margin-top: 0.5rem;
-    flex-wrap: wrap; /* Permite que o rodapé da anotação quebre */
-    gap: 0.5rem; /* Espaçamento extra para responsividade */
+/* --- NOVAS CLASSES PARA BOTÕES DO HEADER --- */
+.profileActions {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+  margin-left: auto; /* Empurra os botões para a direita */
 }
 
-/* Estilos para os botões de ação dentro dos itens da lista */
-.listDeleteButton, .listActionButton {
-    background: none;
-    border: none;
-    font-size: 1.1rem;
-    cursor: pointer;
-    color: var(--cor-cinza-escuro);
-    transition: color 0.2s;
+.editHeaderBtn, .deleteHeaderBtn {
+  padding: 0.7rem 1.2rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
 }
 
-.listDeleteButton:hover { color: var(--cor-vermelho); }
-.listActionButton:hover { color: var(--cor-azul-claro); }
-
-/* Container para os botões de ação da anotação, para alinhamento */
-.noteActions {
-    display: flex;
-    gap: 0.5rem; 
-    align-items: center;
-    flex-shrink: 0;
+.editHeaderBtn {
+  background-color: var(--cor-branco);
+  color: var(--cor-azul-escuro);
 }
 
-/* Estilos para a barra de busca e o botão de adicionar nas abas */
-.tabHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap; /* Garante responsividade para quebra em linhas menores */
+.editHeaderBtn:hover {
+  background-color: var(--cor-cinza-claro);
+  border-color: #ccc;
 }
 
-.searchBarContainer {
-    position: relative;
-    flex-grow: 1; 
-    min-width: 200px; 
+.deleteHeaderBtn {
+  background-color: #fff2f0;
+  color: var(--cor-vermelho);
+  border-color: #ffccc7;
 }
 
-.searchIcon {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    color: var(--cor-cinza-escuro);
-    pointer-events: none; 
+.deleteHeaderBtn:hover {
+  background-color: var(--cor-vermelho);
+  color: var(--cor-branco);
+  border-color: var(--cor-vermelho);
 }
 
-.searchInput {
-    width: 100%;
-    padding: 0.7rem 0.8rem 0.7rem 2.5rem; 
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1rem;
-}
-
-.searchInput:focus {
-    outline: none;
-    border-color: var(--cor-azul-claro);
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-}
-
-/* Estilos para os Modais de Visualização (VIEW_DOC, VIEW_NOTE) */
-.viewModalContent {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem; 
-}
-
-.viewModalContent p {
-    margin: 0;
-    line-height: 1.5;
-}
-
-.viewDocumentLink {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background-color: var(--cor-azul-claro);
-    color: var(--cor-branco);
-    padding: 0.75rem 1.25rem;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    margin-top: 1rem;
-    transition: background-color 0.2s;
-}
-
-.viewDocumentLink:hover {
-    background-color: #3a7bc8;
-}
-
-.noFileMessage {
-    color: var(--cor-vermelho);
-    font-style: italic;
-    margin-top: 1rem;
-}
-
-.noteFullContent {
-    margin-top: 1rem;
-    border-top: 1px solid #eee;
-    padding-top: 1rem;
-}
-
-/* Estilos para o Modal de Histórico de Anotações */
-.historyList {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 1rem;
-}
-
-.historyItem {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 1rem;
-    background-color: var(--cor-cinza-claro);
-    font-size: 0.9rem;
-}
-
-.historyItem p {
-    margin: 0.5rem 0;
-    line-height: 1.4;
-}
-
-.historyOldContent {
-    background-color: var(--cor-branco);
-    border-left: 3px solid var(--cor-azul-claro);
-    padding: 0.75rem 1rem;
-    margin-top: 0.75rem;
-    font-style: italic;
-    color: var(--cor-cinza-escuro);
-    border-radius: 0 4px 4px 0;
-    white-space: pre-wrap; 
-    word-wrap: break-word; 
-}
-
-.noHistoryMessage {
-    text-align: center;
-    color: var(--cor-cinza-escuro);
-    font-style: italic;
-    padding: 1rem;
-}
-
-
-/* --- Media Queries para Responsividade --- */
 
 @media (max-width: 768px) {
-    /* Ajustes gerais de padding para telas menores */
-    .container {
-        padding: 1rem;
-    }
-
-    .tabContent {
-        padding: 1.5rem;
-    }
-
-    /* Header: Botões podem se empilhar melhor */
-    .header {
-        flex-direction: column;
-        align-items: stretch; /* Estica os itens para preencher a largura */
-        gap: 1.5rem; /* Aumenta o espaço quando empilhado */
-    }
-
-    .header > div:first-child { /* Bloco do título e subtítulo */
-        width: 100%;
-    }
-
-    .actions {
-        width: 100%;
-        justify-content: space-around; /* Distribui os botões horizontalmente */
-        margin-top: 0; /* Remove margem extra quando empilhado */
-    }
-
-    .title {
-        font-size: 2rem; /* Reduz o tamanho do título em telas menores */
-        text-align: center;
-    }
-    .subtitle {
-        text-align: center;
-    }
-
-    .backLink {
-        text-align: center;
-        width: 100%;
-    }
-
-
-    /* Abas: A rolagem horizontal já está implementada, mas podemos ajustar o padding */
-    .tabNav {
-        padding-bottom: 0.5rem; /* Espaço para a rolagem */
-        margin-bottom: 1rem;
-    }
-
-    .tabButton, .tabButtonActive {
-        padding: 0.6rem 1rem; /* Diminui o padding das abas */
-        font-size: 0.9rem;
-    }
-
-    /* Infos Grid: Permite quebra mais cedo se necessário */
-    .infoGrid {
-        grid-template-columns: 1fr; /* Força 1 coluna em telas muito pequenas */
-        gap: 1.5rem;
-    }
-
-    /* Lista de Documentos/Anotações: Ajusta o layout para mobile */
-    .listItem, .noteItem {
-        flex-direction: column; /* Empilha o conteúdo e as ações */
-        align-items: flex-start;
-        padding: 0.75rem;
-    }
-
-    .listItemTextContent {
-        width: 100%; /* Ocupa a largura total */
-        padding-right: 0; /* Remove padding extra */
-        margin-bottom: 0.5rem; /* Espaço entre o texto e as ações */
-        white-space: normal; /* Permite que o texto do documento/anotação quebre linha */
-    }
-    .noteItemContent {
-        width: 100%;
-        padding-right: 0;
-        margin-bottom: 0.5rem;
-        white-space: normal;
-    }
-    .noteContentPreview {
-        white-space: normal; /* Permite que o preview da anotação quebre linha */
-        max-height: none; /* Remove o limite de altura para visualização completa no modal */
-        text-overflow: clip; /* Remove o ellipsis no preview do modal */
-    }
-
-
-    .listItemActions, .noteActions {
-        width: 100%; /* Ações ocupam a largura total */
-        justify-content: flex-end; /* Alinha as ações à direita */
-        gap: 0.75rem; /* Reduz um pouco o espaçamento entre os botões */
-    }
-    .noteFooter {
-        justify-content: flex-end; /* Alinha o rodapé da anotação à direita */
-        gap: 0.75rem;
-    }
-
-    /* Busca nas Abas: Garante quebra e alinhamento */
-    .tabHeader {
-        flex-direction: column; /* Empilha a busca e o botão de adicionar */
-        align-items: stretch;
-        gap: 1rem;
-    }
-
-    .searchBarContainer {
-        width: 100%;
-        min-width: unset; /* Remove min-width para melhor adaptação */
-    }
-
-    .listAddButton {
-        width: 100%; /* Botão de adicionar ocupa a largura total */
-        justify-content: center; /* Centraliza o texto e ícone no botão */
-    }
-
-    /* Modal Content: Adapta padding e tamanho */
-    .viewModalContent {
-        padding: 0.75rem;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Ajustes para telefones muito pequenos */
-    .title {
-        font-size: 1.8rem;
-    }
-    .editButton, .deleteButton {
-        padding: 0.6rem 0.8rem; /* Botões menores */
-        font-size: 0.85rem;
-    }
-    .actions {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    .tabContent {
-        padding: 1rem;
-    }
+  .pageContainer { padding: 1rem; }
+  .profileHeader { flex-direction: column; text-align: center; }
+  .profileActions { margin-left: 0; width: 100%; justify-content: center; }
+  .tabsNav { flex-wrap: wrap; }
+  .tabButton, .tabButtonActive { flex-grow: 1; justify-content: center; }
 }

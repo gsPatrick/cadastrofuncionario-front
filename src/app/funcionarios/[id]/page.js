@@ -1,393 +1,364 @@
 // app/funcionarios/[id]/page.js
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { FiEdit, FiTrash2, FiPlus, FiFileText, FiMessageSquare, FiSearch, FiExternalLink, FiClock } from 'react-icons/fi';
+import { FiUser, FiFileText, FiMessageSquare, FiClock, FiUpload, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
 import styles from './details.module.css';
+import { API_BASE_URL, getAuthHeaders } from '../../../utils/api';
 
-// Importando todos os componentes de formulário e o modal genérico
+// Componentes Reutilizáveis
 import Modal from '../../components/Modal/Modal';
-import EmployeeForm from '../../components/EmployeeForm/EmployeeForm';
+import Spinner from '../../components/Spinner/Spinner';
 import DocumentUploadForm from '../../components/DocumentUploadForm/DocumentUploadForm';
-import DocumentForm from '../../components/DocumentForm/DocumentForm'; // Para editar metadados do doc
 import AnnotationForm from '../../components/AnnotationForm/AnnotationForm';
-
-// --- Dados Fictícios (Mock Data) ---
-// Contém todos os campos para simular uma resposta completa da API
-const MOCK_FUNCIONARIOS = {
-    '1': { 
-        id: 1, nome: 'Ana Silva', dataNascimento: '1990-05-15', sexo: 'Feminino', estadoCivil: 'Casado(a)', cpf: '111.222.333-44', rg: '12.345.678-9', orgaoExpedidor: 'SSP/SP',
-        telefone: '(11) 98765-4321', telefoneEmergencia: '(11) 91234-5678', emailPessoal: 'ana.silva@email.com', emailInstitucional: 'ana.silva@empresa.com',
-        cep: '01000-000', logradouro: 'Rua das Flores', numero: '123', complemento: 'Apto 10', bairro: 'Centro', cidade: 'São Paulo', estado: 'SP',
-        matricula: 'F001', dataAdmissao: '2022-01-10', cargo: 'Desenvolvedora Frontend', funcao: 'Desenvolvedora Pleno', setor: 'Tecnologia', lotacaoAtual: 'Sede', vinculoInstitucional: 'Efetivo', situacaoFuncional: 'Ativo',
-        observacoes: 'Especialista em React e Next.js.',
-        documentos: [
-            { id: 'd1', tipo: 'Contrato', descricao: 'Contrato de Trabalho Assinado (PDF)', data: '15/01/2023', url: '/docs/contrato_ana.pdf' },
-            { id: 'd2', tipo: 'RG', descricao: 'Cópia digitalizada do RG', data: '20/01/2023', url: '/docs/rg_ana.jpg' }
-        ], 
-        anotacoes: [
-            { 
-                id: 'a1', 
-                titulo: 'Feedback Q1', 
-                categoria: 'Desempenho', 
-                conteudo: 'Excelente desempenho no primeiro trimestre, superou as expectativas em 2 projetos chave.', 
-                data: '10/04/2023', 
-                autor: 'Carlos Andrade',
-                history: [ // NOVO CAMPO: HISTÓRICO
-                    { date: '05/04/2023 10:30', author: 'Carlos Andrade', oldContent: 'Bom desempenho no primeiro trimestre.' },
-                    { date: '08/04/2023 14:00', author: 'Ana Paula', oldContent: 'Bom desempenho no primeiro trimestre, com algumas observações.' }
-                ]
-            },
-            { id: 'a2', titulo: 'Treinamento Concluído', categoria: 'Desenvolvimento', conteudo: 'Concluiu o curso avançado de Next.js com 95% de aproveitamento.', data: '05/06/2023', autor: 'RH Equipe' }
-        ] 
-    },
-    '2': { 
-        id: 2, nome: 'Bruno Costa', matricula: 'F002', cargo: 'Desenvolvedor Backend', setor: 'Tecnologia', situacaoFuncional: 'Ativo', telefone: '(21) 99999-8888',
-        dataNascimento: '1988-11-20', sexo: 'Masculino', estadoCivil: 'Solteiro(a)', cpf: '222.333.444-55', rg: '98.765.432-1', orgaoExpedidor: 'DETRAN/RJ',
-        telefoneEmergencia: '(21) 98888-7777', emailPessoal: 'bruno.c@email.com', emailInstitucional: 'bruno.c@empresa.com',
-        cep: '20000-000', logradouro: 'Av. Brasil', numero: '456', complemento: '', bairro: 'Centro', cidade: 'Rio de Janeiro', estado: 'RJ',
-        dataAdmissao: '2021-03-01', funcao: 'Especialista em Node.js', lotacaoAtual: 'Escritório RJ', vinculoInstitucional: 'Efetivo',
-        observacoes: 'Participa ativamente de projetos open-source.',
-        documentos: [], anotacoes: [] 
-    },
-};
+import EmployeeForm from '../../components/EmployeeForm/EmployeeForm';
 
 export default function FuncionarioDetailsPage() {
-    const params = useParams();
-    const router = useRouter();
-    const [employee, setEmployee] = useState(null);
-    const [activeTab, setActiveTab] = useState('info');
+  const [employee, setEmployee] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('details'); // details, documents, annotations, history
+  
+  // Estados dos Modais
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isAnnotationModalOpen, setIsAnnotationModalOpen] = useState(false);
+  const [editingAnnotation, setEditingAnnotation] = useState(null);
+  const [isEditEmployeeModalOpen, setIsEditEmployeeModalOpen] = useState(false);
+  
+  const params = useParams();
+  const router = useRouter();
+  const { id: employeeId } = params;
 
-    // Estado centralizado para controlar todos os modais
-    // Tipos de modal: 'EDIT_EMPLOYEE', 'UPLOAD_DOC', 'EDIT_DOC', 'VIEW_DOC', 'NOTE', 'VIEW_NOTE', 'VIEW_NOTE_HISTORY'
-    const [modalState, setModalState] = useState({ type: null, data: null }); 
+  // Constrói a URL base do servidor para os links de download
+  const serverRootUrl = API_BASE_URL.replace('/api', '');
 
-    // Estados para busca interna nas abas
-    const [docSearchTerm, setDocSearchTerm] = useState('');
-    const [noteSearchTerm, setNoteSearchTerm] = useState('');
-
-    useEffect(() => {
-        // Simula uma chamada de API para buscar os dados do funcionário com base no ID da URL
-        const data = MOCK_FUNCIONARIOS[params.id];
-        setEmployee(data);
-    }, [params.id]);
-
-    // Funções genéricas para abrir e fechar modais
-    const handleOpenModal = (type, data = null) => setModalState({ type, data });
-    const handleCloseModal = () => setModalState({ type: null, data: null });
-
-    // --- Lógica de Filtragem com useMemo para otimização ---
-    const filteredDocuments = useMemo(() => {
-        if (!employee?.documentos) return [];
-        if (!docSearchTerm) return employee.documentos;
-        return employee.documentos.filter(doc => 
-            doc.tipo.toLowerCase().includes(docSearchTerm.toLowerCase()) ||
-            doc.descricao.toLowerCase().includes(docSearchTerm.toLowerCase())
-        );
-    }, [employee?.documentos, docSearchTerm]);
-
-    const filteredAnnotations = useMemo(() => {
-        if (!employee?.anotacoes) return [];
-        if (!noteSearchTerm) return employee.anotacoes;
-        return employee.anotacoes.filter(note =>
-            note.titulo.toLowerCase().includes(noteSearchTerm.toLowerCase()) ||
-            note.categoria.toLowerCase().includes(noteSearchTerm.toLowerCase()) ||
-            note.conteudo.toLowerCase().includes(noteSearchTerm.toLowerCase())
-        );
-    }, [employee?.anotacoes, noteSearchTerm]);
+  const fetchData = useCallback(async () => {
+    if (!employeeId) return;
+    // Não seta loading em re-fetch para uma experiência mais suave
+    if (!employee) setIsLoading(true);
+    setError('');
     
-    // --- Funções de Submissão (Submit Handlers) ---
-    const handleEmployeeUpdate = (formData) => {
-        // Em uma aplicação real, aqui você faria a chamada PUT/PATCH para a API com formData
-        console.log("Atualizando cadastro principal:", formData);
-        setEmployee(prev => ({ ...prev, ...formData }));
-        handleCloseModal();
-    };
+    try {
+      // Busca os dados principais (que já incluem documentos e anotações)
+      const employeeRes = await fetch(`${API_BASE_URL}/employees/${employeeId}`, { headers: getAuthHeaders() });
+      if (employeeRes.status === 401) return router.push('/login');
+      if (!employeeRes.ok) throw new Error('Falha ao buscar dados do funcionário.');
+      const employeeData = await employeeRes.json();
+      setEmployee(employeeData.data.employee);
 
-    const handleDocUploadSubmit = ({ tipo, descricao, files }) => {
-        // Em uma aplicação real, aqui você enviaria os arquivos para o backend via FormData
-        const newDocs = files.map(file => ({
-            id: `d${Date.now()}-${file.name}`, // ID único para o mock
-            tipo: tipo,
-            descricao: `${descricao || 'Sem descrição'} (${file.name})`,
-            data: new Date().toLocaleDateString('pt-BR'),
-            url: `/docs/${file.name}` // URL fictícia para simular o download
-        }));
-        setEmployee(prev => ({ ...prev, documentos: [...(prev.documentos || []), ...newDocs] }));
-        handleCloseModal();
-    };
+      // Busca o histórico funcional
+      const historyRes = await fetch(`${API_BASE_URL}/employees/${employeeId}/history`, { headers: getAuthHeaders() });
+      if (!historyRes.ok) throw new Error('Falha ao buscar histórico do funcionário.');
+      const historyData = await historyRes.json();
+      setHistory(historyData.data.history);
 
-    const handleDocSubmit = (formData) => { // Para editar metadados de um documento existente
-        setEmployee(prev => ({ ...prev, documentos: prev.documentos.map(d => d.id === modalState.data.id ? { ...d, ...formData } : d) }));
-        handleCloseModal();
-    };
-
-    const handleNoteSubmit = (formData) => {
-        const notes = employee.anotacoes || [];
-        if (modalState.data) { // Editando anotação existente
-            // Simulação de adição ao histórico ao editar: registra a versão anterior
-            const oldNote = notes.find(n => n.id === modalState.data.id);
-            const newHistoryEntry = { 
-                date: new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR').substring(0, 5), 
-                author: 'Usuário Logado', // Em app real, seria o nome do usuário logado
-                oldContent: oldNote.conteudo 
-            };
-            setEmployee(prev => ({ 
-                ...prev, 
-                anotacoes: notes.map(n => 
-                    n.id === modalState.data.id ? 
-                    { ...n, ...formData, history: [...(n.history || []), newHistoryEntry] } : // Adiciona ao histórico
-                    n
-                ) 
-            }));
-        } else { // Adicionando nova anotação
-            const newNote = { ...formData, id: `a${Date.now()}`, data: new Date().toLocaleDateString('pt-BR'), autor: 'Usuário Logado', history: [] }; // Nova anotação começa com histórico vazio
-            setEmployee(prev => ({ ...prev, anotacoes: [...notes, newNote] }));
-        }
-        handleCloseModal();
-    };
-    
-    // --- Funções de Exclusão (Delete Handlers) ---
-    const handleDeleteEmployee = () => { 
-        if(confirm('TEM CERTEZA QUE DESEJA EXCLUIR ESTE FUNCIONÁRIO?\nEsta ação não pode ser desfeita.')) { 
-            console.log(`Excluindo funcionário com ID: ${employee.id}`);
-            // Em uma aplicação real, aqui você faria a chamada DELETE para a API
-            router.push('/dashboard'); // Redireciona de volta ao dashboard após a exclusão
-        }
-    };
-    const handleDeleteDoc = (docId) => { 
-        if(confirm('Tem certeza que deseja excluir este documento?')) {
-            console.log(`Excluindo documento com ID: ${docId}`);
-            setEmployee(prev => ({ ...prev, documentos: prev.documentos.filter(d => d.id !== docId) }));
-        }
-    };
-    const handleDeleteNote = (noteId) => { 
-        if(confirm('Tem certeza que deseja excluir esta anotação?')) {
-            console.log(`Excluindo anotação com ID: ${noteId}`);
-            setEmployee(prev => ({ ...prev, anotacoes: prev.anotacoes.filter(n => n.id !== noteId) }));
-        }
-    };
-
-    // Renderiza uma mensagem de carregamento ou "não encontrado" enquanto os dados não estão prontos
-    if (!employee) {
-        return <div className={styles.container}><p>Carregando dados do funcionário...</p></div>;
+    } catch (err) {
+      setError(err.message);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
+  }, [employeeId, router, employee]);
 
-    return (
-        <main className={styles.container}>
-            <header className={styles.header}>
-                <div>
-                    <Link href="/dashboard" className={styles.backLink}>&larr; Voltar para a lista</Link>
-                    <h1 className={styles.title}>{employee.nome}</h1>
-                    <p className={styles.subtitle}>{employee.cargo} &bull; {employee.setor}</p>
-                </div>
-                <div className={styles.actions}>
-                    <button className={styles.deleteButton} onClick={handleDeleteEmployee}><FiTrash2 /> Excluir Cadastro</button>
-                    <button className={styles.editButton} onClick={() => handleOpenModal('EDIT_EMPLOYEE', employee)}><FiEdit /> Editar Cadastro</button>
-                </div>
-            </header>
+  useEffect(() => {
+    // A dependência foi removida para executar apenas uma vez na montagem
+    // e ser chamado manualmente por outras funções (fetchData())
+    if (employeeId) {
+        fetchData();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employeeId]);
 
-            {/* Navegação por Abas */}
-            <nav className={styles.tabNav}>
-                <button onClick={() => setActiveTab('info')} className={activeTab === 'info' ? styles.tabButtonActive : styles.tabButton}><FiFileText /> Informações Cadastrais</button>
-                <button onClick={() => setActiveTab('docs')} className={activeTab === 'docs' ? styles.tabButtonActive : styles.tabButton}><FiFileText /> Documentos</button>
-                <button onClick={() => setActiveTab('notes')} className={activeTab === 'notes' ? styles.tabButtonActive : styles.tabButton}><FiMessageSquare /> Anotações</button>
-            </nav>
+  // --- LÓGICA DE CRUD DO FUNCIONÁRIO ---
 
-            {/* Conteúdo das Abas */}
-            <div className={styles.tabContent}>
-                {activeTab === 'info' && (
-                    <div className={styles.infoContainer}>
-                        <div className={styles.infoSection}>
-                            <h3 className={styles.sectionTitle}>Dados Pessoais</h3>
-                            <div className={styles.infoGrid}>
-                                <p><span className={styles.infoLabel}>Nome Completo:</span> {employee.nome || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Data de Nasc.:</span> {employee.dataNascimento || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Sexo:</span> {employee.sexo || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Estado Civil:</span> {employee.estadoCivil || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>CPF:</span> {employee.cpf || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>RG:</span> {employee.rg || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Órgão Expedidor:</span> {employee.orgaoExpedidor || 'Não informado'}</p>
-                            </div>
-                        </div>
-                        <div className={styles.infoSection}>
-                            <h3 className={styles.sectionTitle}>Contato</h3>
-                            <div className={styles.infoGrid}>
-                                <p><span className={styles.infoLabel}>Telefone Celular:</span> {employee.telefone || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Tel. Emergência:</span> {employee.telefoneEmergencia || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>E-mail Pessoal:</span> {employee.emailPessoal || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>E-mail Institucional:</span> {employee.emailInstitucional || 'Não informado'}</p>
-                            </div>
-                        </div>
-                        <div className={styles.infoSection}>
-                            <h3 className={styles.sectionTitle}>Endereço</h3>
-                            <div className={styles.infoGrid}>
-                                <p><span className={styles.infoLabel}>Logradouro:</span> {`${employee.logradouro || ''}, ${employee.numero || ''}`}</p>
-                                <p><span className={styles.infoLabel}>Complemento:</span> {employee.complemento || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Bairro:</span> {employee.bairro || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Cidade/Estado:</span> {`${employee.cidade || ''} / ${employee.estado || ''}`}</p>
-                                <p><span className={styles.infoLabel}>CEP:</span> {employee.cep || 'Não informado'}</p>
-                            </div>
-                        </div>
-                        <div className={styles.infoSection}>
-                            <h3 className={styles.sectionTitle}>Dados Funcionais</h3>
-                            <div className={styles.infoGrid}>
-                                <p><span className={styles.infoLabel}>Matrícula:</span> {employee.matricula || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Data de Admissão:</span> {employee.dataAdmissao || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Vínculo:</span> {employee.vinculoInstitucional || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Situação:</span> {employee.situacaoFuncional || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Cargo:</span> {employee.cargo || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Função:</span> {employee.funcao || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Setor:</span> {employee.setor || 'Não informado'}</p>
-                                <p><span className={styles.infoLabel}>Lotação Atual:</span> {employee.lotacaoAtual || 'Não informado'}</p>
-                            </div>
-                        </div>
-                        <div className={styles.infoSection}>
-                            <h3 className={styles.sectionTitle}>Observações</h3>
-                            <p>{employee.observacoes || 'Nenhuma observação.'}</p>
-                        </div>
-                    </div>
-                )}
-                
-                {activeTab === 'docs' && (
-                    <div>
-                        <div className={styles.tabHeader}>
-                            <div className={styles.searchBarContainer}>
-                                <FiSearch className={styles.searchIcon} />
-                                <input type="text" placeholder="Buscar em documentos..." className={styles.searchInput} value={docSearchTerm} onChange={(e) => setDocSearchTerm(e.target.value)} />
-                            </div>
-                            <button className={styles.listAddButton} onClick={() => handleOpenModal('UPLOAD_DOC')}><FiPlus /> Adicionar Documento(s)</button>
-                        </div>
-                        <ul className={styles.list}>
-                            {filteredDocuments.length > 0 ? filteredDocuments.map(doc => (
-                                <li key={doc.id} className={styles.listItem}>
-                                    {/* CLICAR NESTA ÁREA ABRE O MODAL DE VISUALIZAÇÃO DO DOCUMENTO */}
-                                    <div className={styles.listItemTextContent} onClick={() => handleOpenModal('VIEW_DOC', doc)}>
-                                        <span>{doc.tipo} - {doc.descricao}</span>
-                                    </div>
-                                    <div className={styles.listItemActions}>
-                                        <span>{doc.data}</span>
-                                        <button className={styles.listActionButton} onClick={(e) => { e.stopPropagation(); handleOpenModal('EDIT_DOC', doc); }}><FiEdit /></button>
-                                        <button className={styles.listDeleteButton} onClick={(e) => { e.stopPropagation(); handleDeleteDoc(doc.id); }}><FiTrash2 /></button>
-                                    </div>
-                                </li>
-                            )) : <p>Nenhum documento encontrado.</p>}
-                        </ul>
-                    </div>
-                )}
+  const handleEditEmployeeSubmit = async (formData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/employees/${employeeId}`, {
+        method: 'PUT',
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-                {activeTab === 'notes' && (
-                     <div>
-                        <div className={styles.tabHeader}>
-                            <div className={styles.searchBarContainer}>
-                                <FiSearch className={styles.searchIcon} />
-                                <input type="text" placeholder="Buscar em anotações..." className={styles.searchInput} value={noteSearchTerm} onChange={(e) => setNoteSearchTerm(e.target.value)} />
-                            </div>
-                            <button className={styles.listAddButton} onClick={() => handleOpenModal('NOTE')}><FiPlus /> Nova Anotação</button>
-                        </div>
-                        <ul className={styles.list}>
-                             {filteredAnnotations.length > 0 ? filteredAnnotations.map(note => (
-                                <li key={note.id} className={`${styles.listItem} ${styles.noteItem}`}>
-                                    {/* CLICAR NESTA ÁREA ABRE O MODAL DE VISUALIZAÇÃO DA ANOTAÇÃO */}
-                                    <div className={styles.noteItemContent} onClick={() => handleOpenModal('VIEW_NOTE', note)}>
-                                        <div className={styles.noteHeader}><strong>{note.titulo}</strong> ({note.categoria})</div>
-                                        <p className={styles.noteContentPreview}>{note.conteudo}</p> {/* Preview do conteúdo */}
-                                    </div>
-                                    <div className={styles.noteFooter}>
-                                        <span>Por: {note.autor} em {note.data}</span>
-                                        <div className={styles.noteActions}> {/* Container para os botões de ação da anotação */}
-                                            {note.history && note.history.length > 0 && ( // Botão de histórico visível se houver histórico
-                                                <button className={styles.listActionButton} onClick={(e) => { e.stopPropagation(); handleOpenModal('VIEW_NOTE_HISTORY', note.history); }}>
-                                                    <FiClock /> {/* Ícone de relógio para histórico */}
-                                                </button>
-                                            )}
-                                            <button className={styles.listActionButton} onClick={(e) => { e.stopPropagation(); handleOpenModal('NOTE', note); }}><FiEdit /></button>
-                                            <button className={styles.listDeleteButton} onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }}><FiTrash2 /></button>
-                                        </div>
-                                    </div>
-                                </li>
-                             )) : <p>Nenhuma anotação encontrada.</p>}
-                        </ul>
-                    </div>
-                )}
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao atualizar funcionário.');
+      }
+
+      setIsEditEmployeeModalOpen(false);
+      await fetchData(); // Re-busca os dados para atualizar a página
+      alert('Funcionário atualizado com sucesso!');
+    } catch (err) {
+      alert(`Erro: ${err.message}`);
+    }
+  };
+
+  const handleDeleteEmployee = async () => {
+    if (window.confirm(`Tem certeza que deseja excluir permanentemente o funcionário "${employee.fullName}"? Esta ação não pode ser desfeita.`)) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/employees/${employeeId}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders(),
+        });
+
+        if (!response.ok) {
+          throw new Error('Falha ao excluir o funcionário.');
+        }
+
+        alert('Funcionário excluído com sucesso.');
+        router.push('/dashboard'); // Redireciona para o dashboard após a exclusão
+      } catch (err) {
+        alert(`Erro: ${err.message}`);
+      }
+    }
+  };
+
+  // --- LÓGICA DE DOCUMENTOS ---
+  const handleUploadSubmit = async (formData) => {
+    try {
+      const apiFormData = new FormData();
+      formData.files.forEach(file => {
+        apiFormData.append('files', file);
+      });
+      apiFormData.append('documentType', formData.documentType);
+      apiFormData.append('description', formData.description);
+
+      const response = await fetch(`${API_BASE_URL}/employees/${employeeId}/documents`, {
+        method: 'POST',
+        headers: getAuthHeaders(), // Não defina Content-Type, o browser faz isso para FormData
+        body: apiFormData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao enviar arquivos.');
+      }
+
+      setIsUploadModalOpen(false);
+      await fetchData(); // Re-busca os dados para atualizar a lista
+      alert('Documentos enviados com sucesso!');
+    } catch (err) {
+      alert(`Erro: ${err.message}`);
+    }
+  };
+  
+  const handleDeleteDocument = async (documentId) => {
+    if (confirm('Tem certeza que deseja excluir este documento?')) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/documents/${documentId}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders(),
+        });
+        if (!response.ok) throw new Error('Falha ao excluir documento.');
+        await fetchData();
+        alert('Documento excluído com sucesso.');
+      } catch (err) {
+        alert(`Erro: ${err.message}`);
+      }
+    }
+  };
+
+  // --- LÓGICA DE ANOTAÇÕES ---
+  const handleOpenAnnotationModal = (annotation = null) => {
+    setEditingAnnotation(annotation);
+    setIsAnnotationModalOpen(true);
+  };
+  
+  const handleAnnotationSubmit = async (formData) => {
+    const isEditing = !!editingAnnotation;
+    const url = isEditing 
+      ? `${API_BASE_URL}/annotations/${editingAnnotation.id}`
+      : `${API_BASE_URL}/employees/${employeeId}/annotations`;
+    const method = isEditing ? 'PUT' : 'POST';
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao salvar anotação.');
+      }
+      
+      setIsAnnotationModalOpen(false);
+      setEditingAnnotation(null);
+      await fetchData();
+      alert(`Anotação ${isEditing ? 'atualizada' : 'criada'} com sucesso!`);
+    } catch (err) {
+      alert(`Erro: ${err.message}`);
+    }
+  };
+
+  const handleDeleteAnnotation = async (annotationId) => {
+    if (confirm('Tem certeza que deseja excluir esta anotação?')) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/annotations/${annotationId}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders(),
+        });
+        if (!response.ok) throw new Error('Falha ao excluir anotação.');
+        await fetchData();
+        alert('Anotação excluída com sucesso.');
+      } catch (err) {
+        alert(`Erro: ${err.message}`);
+      }
+    }
+  };
+
+  if (isLoading) return <div className={styles.centered}><Spinner size="large" color="var(--cor-azul-escuro)" /></div>;
+  if (error) return <div className={`${styles.centered} ${styles.errorText}`}>{error}</div>;
+  if (!employee) return <div className={styles.centered}>Funcionário não encontrado.</div>;
+
+  return (
+    <main className={styles.pageContainer}>
+      {/* CABEÇALHO DO PERFIL */}
+      <header className={styles.profileHeader}>
+        <div className={styles.profileAvatar}><FiUser size={50} /></div>
+        <div className={styles.profileInfo}>
+          <h1 className={styles.profileName}>{employee.fullName}</h1>
+          <p className={styles.profileMeta}>
+            <strong>Matrícula:</strong> {employee.registrationNumber} | <strong>Cargo:</strong> {employee.position}
+          </p>
+        </div>
+        <div className={styles.profileActions}>
+          <button className={styles.editHeaderBtn} onClick={() => setIsEditEmployeeModalOpen(true)}><FiEdit /> Editar Dados</button>
+          <button className={styles.deleteHeaderBtn} onClick={handleDeleteEmployee}><FiTrash2 /> Excluir Funcionário</button>
+        </div>
+      </header>
+
+      {/* NAVEGAÇÃO POR ABAS */}
+      <nav className={styles.tabsNav}>
+        <button onClick={() => setActiveTab('details')} className={activeTab === 'details' ? styles.tabButtonActive : styles.tabButton}><FiUser /> Detalhes</button>
+        <button onClick={() => setActiveTab('documents')} className={activeTab === 'documents' ? styles.tabButtonActive : styles.tabButton}><FiFileText /> Documentos</button>
+        <button onClick={() => setActiveTab('annotations')} className={activeTab === 'annotations' ? styles.tabButtonActive : styles.tabButton}><FiMessageSquare /> Anotações</button>
+        <button onClick={() => setActiveTab('history')} className={activeTab === 'history' ? styles.tabButtonActive : styles.tabButton}><FiClock /> Histórico</button>
+      </nav>
+
+      {/* CONTEÚDO DAS ABAS */}
+      <div className={styles.tabContent}>
+        {activeTab === 'details' && (
+          <div className={styles.detailsGrid}>
+            {Object.entries(employee)
+              .filter(([key]) => key !== 'documents' && key !== 'annotations') // Filtra para não mostrar arrays complexos
+              .map(([key, value]) => (
+              <div key={key} className={styles.detailItem}>
+                <strong className={styles.detailLabel}>{key}</strong>
+                <span className={styles.detailValue}>{String(value) || '-'}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {activeTab === 'documents' && (
+          <div>
+            <div className={styles.contentHeader}>
+              <h2>Documentos Anexados</h2>
+              <button className={styles.actionButton} onClick={() => setIsUploadModalOpen(true)}><FiUpload /> Fazer Upload</button>
             </div>
+            {employee.documents && employee.documents.length > 0 ? (
+              <ul className={styles.list}>
+                {employee.documents.map(doc => (
+                  <a 
+                    key={doc.id}
+                    href={`${serverRootUrl}/${doc.filePath}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    download 
+                    className={styles.documentLink}
+                  >
+                    <li className={styles.listItem}>
+                      <FiFileText className={styles.listIcon} />
+                      <div className={styles.listItemContent}>
+                        <strong>{doc.documentType}</strong>
+                        <span>{doc.description || 'Sem descrição'}</span>
+                        <small>Enviado em: {new Date(doc.uploadedAt).toLocaleString('pt-BR')}</small>
+                      </div>
+                      <button 
+                        className={styles.deleteButton} 
+                        onClick={(e) => {
+                          e.preventDefault(); 
+                          handleDeleteDocument(doc.id);
+                        }}
+                      >
+                        <FiTrash2 />
+                      </button>
+                    </li>
+                  </a>
+                ))}
+              </ul>
+            ) : (<p className={styles.emptyState}>Nenhum documento anexado.</p>)}
+          </div>
+        )}
 
-            {/* --- Modais Reutilizáveis --- */}
-            
-            {/* Modal de Edição do Cadastro Principal do Funcionário */}
-            <Modal isOpen={modalState.type === 'EDIT_EMPLOYEE'} onClose={handleCloseModal} title="Editar Dados Cadastrais">
-                <EmployeeForm employeeData={modalState.data} onSubmit={handleEmployeeUpdate} onCancel={handleCloseModal} />
-            </Modal>
-
-            {/* Modal para Upload de Novos Documentos */}
-            <Modal isOpen={modalState.type === 'UPLOAD_DOC'} onClose={handleCloseModal} title="Enviar Novos Documentos">
-                <DocumentUploadForm onSubmit={handleDocUploadSubmit} onCancel={handleCloseModal} />
-            </Modal>
-
-            {/* Modal para Edição de Metadados de Documento (tipo/descrição) */}
-            <Modal isOpen={modalState.type === 'EDIT_DOC'} onClose={handleCloseModal} title="Editar Documento">
-                <DocumentForm initialData={modalState.data} onSubmit={handleDocSubmit} onCancel={handleCloseModal} />
-            </Modal>
-
-            {/* Modal para Adição/Edição de Anotação */}
-            <Modal isOpen={modalState.type === 'NOTE'} onClose={handleCloseModal} title={modalState.data ? "Editar Anotação" : "Nova Anotação"}>
-                <AnnotationForm initialData={modalState.data} onSubmit={handleNoteSubmit} onCancel={handleCloseModal} />
-            </Modal>
-
-            {/* --- Modais de Visualização --- */}
-
-            {/* Modal de Visualização de Documento */}
-            <Modal isOpen={modalState.type === 'VIEW_DOC'} onClose={handleCloseModal} title="Visualizar Documento">
-                {modalState.data && (
-                    <div className={styles.viewModalContent}>
-                        <p><span className={styles.infoLabel}>Tipo:</span> {modalState.data.tipo}</p>
-                        <p><span className={styles.infoLabel}>Descrição:</span> {modalState.data.descricao}</p>
-                        <p><span className={styles.infoLabel}>Data de Envio:</span> {modalState.data.data}</p>
-                        {modalState.data.url && (
-                            <a href={modalState.data.url} target="_blank" rel="noopener noreferrer" className={styles.viewDocumentLink}>
-                                <FiExternalLink /> Abrir Documento
-                            </a>
-                        )}
-                        {!modalState.data.url && <p className={styles.noFileMessage}>Arquivo não disponível para visualização (simulação).</p>}
+        {activeTab === 'annotations' && (
+           <div>
+            <div className={styles.contentHeader}>
+              <h2>Anotações</h2>
+              <button className={styles.actionButton} onClick={() => handleOpenAnnotationModal()}><FiPlus /> Nova Anotação</button>
+            </div>
+            {employee.annotations && employee.annotations.length > 0 ? (
+              <ul className={styles.list}>
+                {employee.annotations.map(note => (
+                  <li key={note.id} className={styles.listItem}>
+                    <FiMessageSquare className={styles.listIcon} />
+                    <div className={styles.listItemContent}>
+                      <strong>{note.title}</strong>
+                      <span>{note.content}</span>
+                      <small><strong>Categoria:</strong> {note.category} | <strong>Criado em:</strong> {new Date(note.annotationDate).toLocaleString('pt-BR')}</small>
                     </div>
-                )}
-            </Modal>
-
-            {/* Modal de Visualização de Anotação Completa */}
-            <Modal isOpen={modalState.type === 'VIEW_NOTE'} onClose={handleCloseModal} title="Visualizar Anotação">
-                {modalState.data && (
-                    <div className={styles.viewModalContent}>
-                        <p><span className={styles.infoLabel}>Título:</span> {modalState.data.titulo}</p>
-                        <p><span className={styles.infoLabel}>Categoria:</span> {modalState.data.categoria}</p>
-                        <p><span className={styles.infoLabel}>Autor:</span> {modalState.data.autor}</p>
-                        <p><span className={styles.infoLabel}>Data:</span> {modalState.data.data}</p>
-                        <div className={styles.noteFullContent}>
-                            <p className={styles.infoLabel}>Conteúdo:</p>
-                            <p>{modalState.data.conteudo}</p>
-                        </div>
+                    <div className={styles.listItemActions}>
+                      <button className={styles.editButton} onClick={() => handleOpenAnnotationModal(note)}><FiEdit /></button>
+                      <button className={styles.deleteButton} onClick={() => handleDeleteAnnotation(note.id)}><FiTrash2 /></button>
                     </div>
-                )}
-            </Modal>
+                  </li>
+                ))}
+              </ul>
+            ) : (<p className={styles.emptyState}>Nenhuma anotação registrada.</p>)}
+          </div>
+        )}
 
-            {/* Modal de Visualização de Histórico de Anotação */}
-            <Modal isOpen={modalState.type === 'VIEW_NOTE_HISTORY'} onClose={handleCloseModal} title="Histórico de Edições">
-                {modalState.data && modalState.data.length > 0 ? (
-                    <div className={styles.historyList}>
-                        {modalState.data.map((entry, index) => (
-                            <div key={index} className={styles.historyItem}>
-                                <p><span className={styles.infoLabel}>Data/Hora:</span> {entry.date}</p>
-                                <p><span className={styles.infoLabel}>Autor:</span> {entry.author}</p>
-                                <p><span className={styles.infoLabel}>Conteúdo Anterior:</span></p>
-                                <div className={styles.historyOldContent}>"{entry.oldContent}"</div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className={styles.noHistoryMessage}>Nenhum histórico de edição para esta anotação.</p>
-                )}
-            </Modal>
-        </main>
-    );
+        {activeTab === 'history' && (
+          <div>
+            <div className={styles.contentHeader}><h2>Histórico de Alterações</h2></div>
+            {history.length > 0 ? (
+              <table className={styles.historyTable}>
+                <thead><tr><th>Data</th><th>Campo Alterado</th><th>Valor Antigo</th><th>Valor Novo</th><th>Alterado Por</th></tr></thead>
+                <tbody>
+                  {history.map(item => (
+                    <tr key={item.id}>
+                      <td>{new Date(item.createdAt).toLocaleString('pt-BR')}</td>
+                      <td>{item.fieldName}</td>
+                      <td>{item.oldValue}</td>
+                      <td>{item.newValue}</td>
+                      <td>{item.changedBy?.name || 'Sistema'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (<p className={styles.emptyState}>Nenhum histórico de alterações encontrado.</p>)}
+          </div>
+        )}
+      </div>
+
+      {/* MODAIS */}
+      <Modal isOpen={isUploadModalOpen} onClose={() => setIsUploadModalOpen(false)} title="Enviar Documentos">
+        <DocumentUploadForm onSubmit={handleUploadSubmit} onCancel={() => setIsUploadModalOpen(false)} />
+      </Modal>
+      <Modal isOpen={isAnnotationModalOpen} onClose={() => setIsAnnotationModalOpen(false)} title={editingAnnotation ? 'Editar Anotação' : 'Nova Anotação'}>
+        <AnnotationForm initialData={editingAnnotation} onSubmit={handleAnnotationSubmit} onCancel={() => setIsAnnotationModalOpen(false)} />
+      </Modal>
+      <Modal isOpen={isEditEmployeeModalOpen} onClose={() => setIsEditEmployeeModalOpen(false)} title="Editar Dados do Funcionário">
+        <EmployeeForm 
+          employeeData={employee} 
+          onSubmit={handleEditEmployeeSubmit} 
+          onCancel={() => setIsEditEmployeeModalOpen(false)}
+          isEditing={true}
+        />
+      </Modal>
+    </main>
+  );
 }

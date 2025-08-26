@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link'; // <<-- 1. IMPORTAÇÃO ADICIONADA
 import { FiPlus, FiDownload, FiFilter, FiX, FiEdit, FiTrash2, FiSearch } from 'react-icons/fi';
 import styles from './dashboard.module.css';
 import { API_BASE_URL, getAuthHeaders } from '../../utils/api';
@@ -395,6 +396,11 @@ export default function DashboardPage() {
         if (value.includes('T')) {
           return new Date(value).toLocaleDateString('pt-BR');
         }
+        // Se já vier no formato AAAA-MM-DD, converte para DD/MM/AAAA
+        const parts = value.split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
         return value;
       default:
         return value;
@@ -495,7 +501,14 @@ export default function DashboardPage() {
                     <tr key={func.id}>
                       {EMPLOYEE_FIELDS.map(field => (
                         <td key={`${func.id}-${field.name}`}>
-                          {formatDisplayValue(func[field.name], field.name)}
+                          {/* // <<-- 2. LÓGICA DO LINK APLICADA AQUI -->> */}
+                          {field.name === 'fullName' ? (
+                            <Link href={`/funcionarios/${func.id}`} className={styles.nameLink}>
+                              {formatDisplayValue(func[field.name], field.name)}
+                            </Link>
+                          ) : (
+                            formatDisplayValue(func[field.name], field.name)
+                          )}
                         </td>
                       ))}
                       <td className={styles.actionsCell}>

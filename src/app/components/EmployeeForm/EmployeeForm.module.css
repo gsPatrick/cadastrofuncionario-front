@@ -22,26 +22,22 @@
 .inputGroup {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem; /* Diminuído para aproximar a mensagem de erro */
     margin-bottom: 1rem;
 }
 
-/* Chave para a responsividade dos formulários */
 .grid2Cols, .grid3Cols {
     display: grid;
     gap: 1.5rem;
 }
 
-/* Em telas de desktop, cria 2 colunas. Em mobile, vira 1 coluna. */
 .grid2Cols {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
-/* Em telas de desktop, cria 3 colunas. Em mobile, vira 1 coluna. */
 .grid3Cols {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
-
 
 .inputGroup label {
     font-weight: 600;
@@ -55,7 +51,8 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1rem;
-    font-family: inherit; /* Garante que a fonte seja a mesma do resto do app */
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s; /* Adicionado para suavizar a transição do erro */
 }
 
 .inputGroup input:focus,
@@ -102,4 +99,61 @@
 
 .cancelButton:hover {
     background-color: #e9e9e9;
+}
+
+/* --- NOVAS CLASSES PARA VALIDAÇÃO E FEEDBACK --- */
+
+.required {
+    color: var(--cor-vermelho);
+    margin-left: 0.25rem;
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.checkboxGroup label {
+    font-weight: normal;
+}
+
+.cepContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cepContainer input {
+    width: 100%;
+}
+
+.cepContainer > div { /* Estilo para o Spinner dentro do container */
+    position: absolute;
+    right: 10px;
+}
+
+.cepError {
+    color: var(--cor-vermelho);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+/* Estilo para a mensagem de erro abaixo do campo */
+.errorText {
+    color: var(--cor-vermelho);
+    font-size: 0.8rem;
+    min-height: 1.2em; /* Garante que o layout não "pule" quando a mensagem aparece/desaparece */
+}
+
+/* Estilo para o campo de input com erro */
+.inputError {
+    border-color: var(--cor-vermelho);
+    background-color: #fff8f8;
+}
+
+.inputError:focus {
+    border-color: var(--cor-vermelho);
+    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
 }
