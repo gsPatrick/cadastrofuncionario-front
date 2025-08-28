@@ -6,46 +6,43 @@ import styles from './EmployeeForm.module.css';
 import Spinner from '../Spinner/Spinner';
 
 const EmployeeForm = ({ employeeData = null, onSubmit, onCancel, isEditing = false }) => {
-  const [formData, setFormData] = useState({
-    fullName: '', dateOfBirth: '', gender: '', maritalStatus: '', cpf: '', rg: '', rgIssuer: '',
-    hasChildren: false, numberOfChildren: 0, comorbidity: '', disability: '', bloodType: '',
-    educationLevel: '', educationArea: '', mobilePhone1: '', mobilePhone2: '', emergencyContactPhone: '',
-    personalEmail: '', institutionalEmail: '', addressZipCode: '', addressStreet: '', addressNumber: '',
-    addressComplement: '', addressNeighborhood: '', addressCity: '', addressState: '',
-    registrationNumber: '', admissionDate: '', position: '', role: '', department: '',
-    currentAssignment: '', institutionalLink: '', functionalStatus: 'Ativo', generalObservations: ''
-  });
-
-  // NOVO: Estado para armazenar os erros de validação
-  const [errors, setErrors] = useState({});
-  
-  const [isCepLoading, setIsCepLoading] = useState(false);
-  const [cepError, setCepError] = useState('');
-
+  // Estado inicial expandido para incluir os novos campos
   const initialFormState = {
     fullName: '', dateOfBirth: '', gender: '', maritalStatus: '', cpf: '', rg: '', rgIssuer: '',
-    hasChildren: false, numberOfChildren: 0, comorbidity: '', disability: '', bloodType: '',
-    educationLevel: '', educationArea: '', mobilePhone1: '', mobilePhone2: '', emergencyContactPhone: '',
+    hasChildren: false, numberOfChildren: 0,
+    educationLevel: '', educationArea: '',
+    comorbidity: '', disability: '', bloodType: '',
+    mobilePhone1: '', mobilePhone2: '', emergencyContactPhone: '',
     personalEmail: '', institutionalEmail: '', addressZipCode: '', addressStreet: '', addressNumber: '',
     addressComplement: '', addressNeighborhood: '', addressCity: '', addressState: '',
     registrationNumber: '', admissionDate: '', position: '', role: '', department: '',
     currentAssignment: '', institutionalLink: '', functionalStatus: 'Ativo', generalObservations: ''
   };
 
+  const [formData, setFormData] = useState(initialFormState);
+
+  // Estado para armazenar os erros de validação
+  const [errors, setErrors] = useState({});
+  
+  const [isCepLoading, setIsCepLoading] = useState(false);
+  const [cepError, setCepError] = useState('');
+
   useEffect(() => {
     if (isEditing && employeeData) {
       const populatedState = {};
+      // Popula o estado com os dados existentes, garantindo que todos os campos do estado inicial sejam preenchidos
       Object.keys(initialFormState).forEach(key => {
         populatedState[key] = employeeData[key] ?? initialFormState[key];
       });
       setFormData(populatedState);
     } else {
+      // Reseta para o estado inicial para um novo cadastro
       setFormData(initialFormState);
     }
     setErrors({}); // Limpa os erros ao carregar o formulário
   }, [employeeData, isEditing]);
   
-  // Função de validação
+  // Função de validação (sem alterações, pois os novos campos não são obrigatórios)
   const validate = (data) => {
     const newErrors = {};
 
@@ -86,10 +83,8 @@ const EmployeeForm = ({ employeeData = null, onSubmit, onCancel, isEditing = fal
     const { name, value, type, checked } = e.target;
     const val = type === 'checkbox' ? checked : value;
     
-    // Atualiza o estado do formulário
     setFormData(prev => ({ ...prev, [name]: val }));
     
-    // Se o campo tinha um erro, limpa o erro ao começar a digitar
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
     }
@@ -115,7 +110,6 @@ const EmployeeForm = ({ employeeData = null, onSubmit, onCancel, isEditing = fal
         addressCity: data.city,
         addressState: data.state,
       }));
-      // Limpa os erros de endereço que foram preenchidos
       setErrors(prev => ({ ...prev, addressStreet: null, addressNeighborhood: null, addressCity: null, addressState: null }));
     } catch (error) {
       setCepError(error.message);
@@ -129,7 +123,6 @@ const EmployeeForm = ({ employeeData = null, onSubmit, onCancel, isEditing = fal
     const validationErrors = validate(formData);
     setErrors(validationErrors);
 
-    // Se não houver erros (objeto de erros está vazio), então submete
     if (Object.keys(validationErrors).length === 0) {
       onSubmit(formData);
     }
@@ -154,12 +147,36 @@ const EmployeeForm = ({ employeeData = null, onSubmit, onCancel, isEditing = fal
         <div className={styles.grid2Cols}><div className={styles.checkboxGroup}><input type="checkbox" id="hasChildren" name="hasChildren" checked={formData.hasChildren} onChange={handleChange} /><label htmlFor="hasChildren">Possui Filhos?</label></div>{formData.hasChildren && <div className={styles.inputGroup}><label htmlFor="numberOfChildren">Quantos?</label><input type="number" id="numberOfChildren" name="numberOfChildren" value={formData.numberOfChildren} onChange={handleChange} min="0" /></div>}</div>
       </fieldset>
 
+      {/* --- NOVA SEÇÃO DE INFORMAÇÕES ADICIONAIS --- */}
       <fieldset className={styles.fieldset}>
         <legend className={styles.legend}>Informações Adicionais</legend>
-        <div className={styles.grid2Cols}><div className={styles.inputGroup}><label htmlFor="educationLevel">Nível de Formação</label><input type="text" id="educationLevel" name="educationLevel" value={formData.educationLevel} onChange={handleChange} placeholder="Ex: Superior Completo"/></div><div className={styles.inputGroup}><label htmlFor="educationArea">Área de Formação/Titulação</label><input type="text" id="educationArea" name="educationArea" value={formData.educationArea} onChange={handleChange} placeholder="Ex: Análise de Sistemas"/></div></div>
-        <div className={styles.grid3Cols}><div className={styles.inputGroup}><label htmlFor="bloodType">Tipo Sanguíneo</label><input type="text" id="bloodType" name="bloodType" value={formData.bloodType} onChange={handleChange} placeholder="Ex: A+"/></div><div className={styles.inputGroup}><label htmlFor="comorbidity">Comorbidade</label><input type="text" id="comorbidity" name="comorbidity" value={formData.comorbidity} onChange={handleChange} placeholder="Se houver, descreva"/></div><div className={styles.inputGroup}><label htmlFor="disability">Deficiência</label><input type="text" id="disability" name="disability" value={formData.disability} onChange={handleChange} placeholder="Se houver, descreva"/></div></div>
+        <div className={styles.grid2Cols}>
+          <div className={styles.inputGroup}>
+            <label htmlFor="educationLevel">Nível de Formação</label>
+            <input type="text" id="educationLevel" name="educationLevel" value={formData.educationLevel} onChange={handleChange} placeholder="Ex: Superior Completo"/>
+          </div>
+          <div className={styles.inputGroup}>
+            <label htmlFor="educationArea">Área de Formação/Titulação</label>
+            <input type="text" id="educationArea" name="educationArea" value={formData.educationArea} onChange={handleChange} placeholder="Ex: Análise de Sistemas"/>
+          </div>
+        </div>
+        <div className={styles.grid3Cols}>
+          <div className={styles.inputGroup}>
+            <label htmlFor="bloodType">Tipo Sanguíneo</label>
+            <input type="text" id="bloodType" name="bloodType" value={formData.bloodType} onChange={handleChange} placeholder="Ex: A+"/>
+          </div>
+          <div className={styles.inputGroup}>
+            <label htmlFor="comorbidity">Comorbidade</label>
+            <input type="text" id="comorbidity" name="comorbidity" value={formData.comorbidity} onChange={handleChange} placeholder="Se houver, descreva"/>
+          </div>
+          <div className={styles.inputGroup}>
+            <label htmlFor="disability">Deficiência</label>
+            <input type="text" id="disability" name="disability" value={formData.disability} onChange={handleChange} placeholder="Se houver, descreva"/>
+          </div>
+        </div>
       </fieldset>
 
+      {/* --- SEÇÃO DE CONTATO --- */}
       <fieldset className={styles.fieldset}>
         <legend className={styles.legend}>Contato</legend>
         <div className={styles.grid2Cols}>
@@ -171,6 +188,7 @@ const EmployeeForm = ({ employeeData = null, onSubmit, onCancel, isEditing = fal
         </div>
       </fieldset>
       
+      {/* --- SEÇÃO DE ENDEREÇO --- */}
       <fieldset className={styles.fieldset}>
         <legend className={styles.legend}>Endereço</legend>
         <div className={styles.grid3Cols}>
@@ -188,6 +206,7 @@ const EmployeeForm = ({ employeeData = null, onSubmit, onCancel, isEditing = fal
         </div>
       </fieldset>
 
+      {/* --- DADOS FUNCIONAIS --- */}
       <fieldset className={styles.fieldset}>
         <legend className={styles.legend}>Dados Funcionais</legend>
         <div className={styles.grid2Cols}><div className={styles.inputGroup}><label htmlFor="registrationNumber">Matrícula <span className={styles.required}>*</span></label><input type="text" id="registrationNumber" name="registrationNumber" value={formData.registrationNumber} onChange={handleChange} className={errors.registrationNumber ? styles.inputError : ''} /><p className={styles.errorText}>{errors.registrationNumber}</p></div><div className={styles.inputGroup}><label htmlFor="admissionDate">Data de Admissão <span className={styles.required}>*</span></label><input type="date" id="admissionDate" name="admissionDate" value={formData.admissionDate} onChange={handleChange} className={errors.admissionDate ? styles.inputError : ''} /><p className={styles.errorText}>{errors.admissionDate}</p></div></div>
@@ -196,11 +215,13 @@ const EmployeeForm = ({ employeeData = null, onSubmit, onCancel, isEditing = fal
         <div className={styles.inputGroup}><label htmlFor="currentAssignment">Lotação Atual</label><input type="text" id="currentAssignment" name="currentAssignment" value={formData.currentAssignment} onChange={handleChange} /></div>
       </fieldset>
 
+      {/* --- SEÇÃO DE OBSERVAÇÕES --- */}
        <fieldset className={styles.fieldset}>
         <legend className={styles.legend}>Observações</legend>
         <div className={styles.inputGroup}><label htmlFor="generalObservations">Observações Gerais</label><textarea id="generalObservations" name="generalObservations" value={formData.generalObservations} onChange={handleChange} rows="4" /></div>
       </fieldset>
 
+      {/* --- BOTÕES DE AÇÃO --- */}
       <div className={styles.buttonContainer}>
         <button type="button" className={styles.cancelButton} onClick={onCancel}>Cancelar</button>
         <button type="submit" className={styles.saveButton}>Salvar</button>

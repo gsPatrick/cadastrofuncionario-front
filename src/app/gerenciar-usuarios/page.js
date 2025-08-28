@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { FiPlus, FiEdit, FiTrash2, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiPlus, FiEdit, FiTrash2, FiChevronLeft, FiChevronRight, FiArrowLeft } from 'react-icons/fi';
 import styles from './gerenciar.module.css';
 import Modal from '../components/Modal/Modal';
 import UserForm from '../components/UserForm/UserForm';
@@ -46,7 +46,7 @@ export default function GerenciarUsuariosPage() {
     fetchUsuarios();
   }, [fetchUsuarios]);
 
-  // Cálculos da paginação (sem alteração)
+  // Cálculos da paginação
   const totalPages = Math.ceil(usuarios.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -111,7 +111,7 @@ export default function GerenciarUsuariosPage() {
         
         fetchUsuarios(); // Atualiza a lista
 
-        // Lógica de ajuste de página (sem alteração)
+        // Lógica de ajuste de página
         const newTotal = usuarios.length - 1;
         const newTotalPages = Math.ceil(newTotal / itemsPerPage);
         if (currentPage > newTotalPages && newTotalPages > 0) {
@@ -130,6 +130,14 @@ export default function GerenciarUsuariosPage() {
 
   return (
     <main className={styles.pageContainer}>
+      {/* BOTÃO DE VOLTAR ADICIONADO AQUI */}
+      <div className={styles.pageHeaderActions}>
+        <button className={styles.backButton} onClick={() => router.back()}>
+          <FiArrowLeft />
+          Voltar
+        </button>
+      </div>
+
       <div className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Gerenciar Usuários</h1>
         <button className={styles.addUserBtn} onClick={handleOpenAddModal}>
@@ -145,7 +153,7 @@ export default function GerenciarUsuariosPage() {
             <div key={user.id} className={styles.userCard}>
               <div className={styles.userInfo}>
                 <div className={styles.userDetails}>
-                  <h3 className={styles.userName}>{user.name}</h3> {/* Alterado para 'name' */}
+                  <h3 className={styles.userName}>{user.name}</h3>
                   <p className={styles.userLogin}>{user.login}</p>
                   <p className={styles.userEmail}>{user.email}</p>
                 </div>
@@ -170,7 +178,7 @@ export default function GerenciarUsuariosPage() {
               <div key={user.id} className={styles.tableRow}>
                 <div className={styles.tableCell} style={{width: '35%'}}>
                   <div className={styles.cellContent}>
-                    <strong>{user.name}</strong> {/* Alterado para 'name' */}
+                    <strong>{user.name}</strong>
                     <br />
                     <span className={styles.loginText}>{user.login}</span>
                   </div>
@@ -190,7 +198,19 @@ export default function GerenciarUsuariosPage() {
         {/* Paginação */}
         {totalPages > 1 && (
           <div className={styles.paginationContainer}>
-            {/* ... JSX da paginação sem alterações ... */}
+            <span className={styles.paginationInfo}>
+              Página {currentPage} de {totalPages}
+            </span>
+            <div className={styles.paginationControls}>
+              <button onClick={goToPrevious} disabled={currentPage === 1} className={styles.pageButton} title="Página anterior">
+                <FiChevronLeft />
+              </button>
+              {/* Lógica de renderização de números de página pode ser adicionada aqui se desejado */}
+              <span className={`${styles.pageNumber} ${styles.pageNumberActive}`}>{currentPage}</span>
+              <button onClick={goToNext} disabled={currentPage === totalPages} className={styles.pageButton} title="Próxima página">
+                <FiChevronRight />
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { FiUser, FiFileText, FiMessageSquare, FiClock, FiUpload, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
+import { FiUser, FiFileText, FiMessageSquare, FiClock, FiUpload, FiPlus, FiEdit, FiTrash2, FiArrowLeft } from 'react-icons/fi';
 import styles from './details.module.css';
 import { API_BASE_URL, getAuthHeaders } from '../../../utils/api';
 
@@ -13,6 +13,48 @@ import Spinner from '../../components/Spinner/Spinner';
 import DocumentUploadForm from '../../components/DocumentUploadForm/DocumentUploadForm';
 import AnnotationForm from '../../components/AnnotationForm/AnnotationForm';
 import EmployeeForm from '../../components/EmployeeForm/EmployeeForm';
+
+// Mapeamento de nomes de campos para nomes amigáveis para a aba de detalhes
+const fieldDisplayNames = {
+  fullName: 'Nome Completo',
+  registrationNumber: 'Matrícula',
+  institutionalLink: 'Vínculo Institucional',
+  position: 'Cargo',
+  role: 'Função',
+  department: 'Departamento',
+  currentAssignment: 'Lotação Atual',
+  admissionDate: 'Data de Admissão',
+  educationLevel: 'Nível de Formação',
+  educationArea: 'Área de Formação',
+  dateOfBirth: 'Data de Nascimento',
+  gender: 'Gênero',
+  maritalStatus: 'Estado Civil',
+  hasChildren: 'Possui Filhos',
+  numberOfChildren: 'Número de Filhos',
+  cpf: 'CPF',
+  rg: 'RG',
+  rgIssuer: 'Órgão Emissor (RG)',
+  addressStreet: 'Logradouro',
+  addressNumber: 'Número (Endereço)',
+  addressComplement: 'Complemento',
+  addressNeighborhood: 'Bairro',
+  addressCity: 'Cidade',
+  addressState: 'Estado (UF)',
+  addressZipCode: 'CEP',
+  emergencyContactPhone: 'Telefone de Emergência',
+  mobilePhone1: 'Celular 1',
+  mobilePhone2: 'Celular 2',
+  institutionalEmail: 'E-mail Institucional',
+  personalEmail: 'E-mail Pessoal',
+  functionalStatus: 'Situação Funcional',
+  generalObservations: 'Observações Gerais',
+  comorbidity: 'Comorbidade',
+  disability: 'Deficiência',
+  bloodType: 'Tipo Sanguíneo',
+  id: 'ID do Sistema',
+  createdAt: 'Data de Cadastro',
+  updatedAt: 'Última Atualização',
+};
 
 export default function FuncionarioDetailsPage() {
   const [employee, setEmployee] = useState(null);
@@ -36,7 +78,6 @@ export default function FuncionarioDetailsPage() {
 
   const fetchData = useCallback(async () => {
     if (!employeeId) return;
-    // Não seta loading em re-fetch para uma experiência mais suave
     if (!employee) setIsLoading(true);
     setError('');
     
@@ -63,8 +104,6 @@ export default function FuncionarioDetailsPage() {
   }, [employeeId, router, employee]);
 
   useEffect(() => {
-    // A dependência foi removida para executar apenas uma vez na montagem
-    // e ser chamado manualmente por outras funções (fetchData())
     if (employeeId) {
         fetchData();
     }
@@ -87,7 +126,7 @@ export default function FuncionarioDetailsPage() {
       }
 
       setIsEditEmployeeModalOpen(false);
-      await fetchData(); // Re-busca os dados para atualizar a página
+      await fetchData(); 
       alert('Funcionário atualizado com sucesso!');
     } catch (err) {
       alert(`Erro: ${err.message}`);
@@ -107,7 +146,7 @@ export default function FuncionarioDetailsPage() {
         }
 
         alert('Funcionário excluído com sucesso.');
-        router.push('/dashboard'); // Redireciona para o dashboard após a exclusão
+        router.push('/dashboard'); 
       } catch (err) {
         alert(`Erro: ${err.message}`);
       }
@@ -126,7 +165,7 @@ export default function FuncionarioDetailsPage() {
 
       const response = await fetch(`${API_BASE_URL}/employees/${employeeId}/documents`, {
         method: 'POST',
-        headers: getAuthHeaders(), // Não defina Content-Type, o browser faz isso para FormData
+        headers: getAuthHeaders(),
         body: apiFormData,
       });
 
@@ -136,7 +175,7 @@ export default function FuncionarioDetailsPage() {
       }
 
       setIsUploadModalOpen(false);
-      await fetchData(); // Re-busca os dados para atualizar a lista
+      await fetchData(); 
       alert('Documentos enviados com sucesso!');
     } catch (err) {
       alert(`Erro: ${err.message}`);
@@ -215,6 +254,14 @@ export default function FuncionarioDetailsPage() {
 
   return (
     <main className={styles.pageContainer}>
+      {/* BOTÃO DE VOLTAR */}
+      <div className={styles.pageHeaderActions}>
+        <button className={styles.backButton} onClick={() => router.back()}>
+          <FiArrowLeft />
+          Voltar
+        </button>
+      </div>
+      
       {/* CABEÇALHO DO PERFIL */}
       <header className={styles.profileHeader}>
         <div className={styles.profileAvatar}><FiUser size={50} /></div>
@@ -246,7 +293,7 @@ export default function FuncionarioDetailsPage() {
               .filter(([key]) => key !== 'documents' && key !== 'annotations') // Filtra para não mostrar arrays complexos
               .map(([key, value]) => (
               <div key={key} className={styles.detailItem}>
-                <strong className={styles.detailLabel}>{key}</strong>
+                <strong className={styles.detailLabel}>{fieldDisplayNames[key] || key}</strong>
                 <span className={styles.detailValue}>{String(value) || '-'}</span>
               </div>
             ))}
@@ -325,20 +372,22 @@ export default function FuncionarioDetailsPage() {
           <div>
             <div className={styles.contentHeader}><h2>Histórico de Alterações</h2></div>
             {history.length > 0 ? (
-              <table className={styles.historyTable}>
-                <thead><tr><th>Data</th><th>Campo Alterado</th><th>Valor Antigo</th><th>Valor Novo</th><th>Alterado Por</th></tr></thead>
-                <tbody>
-                  {history.map(item => (
-                    <tr key={item.id}>
-                      <td>{new Date(item.createdAt).toLocaleString('pt-BR')}</td>
-                      <td>{item.fieldName}</td>
-                      <td>{item.oldValue}</td>
-                      <td>{item.newValue}</td>
-                      <td>{item.changedBy?.name || 'Sistema'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className={styles.tableWrapper}>
+                <table className={styles.historyTable}>
+                  <thead><tr><th>Data</th><th>Campo Alterado</th><th>Valor Antigo</th><th>Valor Novo</th><th>Alterado Por</th></tr></thead>
+                  <tbody>
+                    {history.map(item => (
+                      <tr key={item.id}>
+                        <td>{new Date(item.createdAt).toLocaleString('pt-BR')}</td>
+                        <td>{item.fieldName}</td>
+                        <td>{item.oldValue}</td>
+                        <td>{item.newValue}</td>
+                        <td>{item.changedBy?.name || 'Sistema'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (<p className={styles.emptyState}>Nenhum histórico de alterações encontrado.</p>)}
           </div>
         )}

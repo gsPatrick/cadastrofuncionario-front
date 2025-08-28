@@ -94,6 +94,41 @@
   display: inline; /* Visível por padrão em desktop */
 }
 
+/* === NOVOS ESTILOS PARA O MENU DE NAVEGAÇÃO === */
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* Centraliza o menu no espaço disponível em telas maiores */
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  color: var(--cor-branco);
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.navLink:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilo para o link da página ativa */
+.navLinkActive {
+  background-color: rgba(255, 255, 255, 0.15);
+  font-weight: 600;
+}
+
 /* --- Media Queries para Responsividade --- */
 
 /* Para telas até 768px (tablets e celulares) */
