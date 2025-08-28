@@ -1,4 +1,3 @@
-// app/dashboard/page.js
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
@@ -344,6 +343,15 @@ export default function DashboardPage() {
     console.log(`Exportando para ${format.toUpperCase()}...`);
     setIsExportMenuOpen(false);
     
+    // ==========================================================
+    // CORREÇÃO APLICADA AQUI
+    // Garante que a extensão para 'excel' seja 'xlsx'.
+    // ==========================================================
+    const getFileExtension = (fmt) => {
+      if (fmt === 'excel') return 'xlsx';
+      return fmt;
+    };
+    
     try {
       const params = new URLSearchParams();
       if (searchTerm) params.append('search', searchTerm);
@@ -367,7 +375,7 @@ export default function DashboardPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `funcionarios_${new Date().toISOString().split('T')[0]}.${format}`;
+      a.download = `funcionarios_${new Date().toISOString().split('T')[0]}.${getFileExtension(format)}`;
       document.body.appendChild(a);
       a.click();
       a.remove();

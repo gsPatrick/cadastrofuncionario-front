@@ -1,55 +1,64 @@
 /* components/Header/Header.module.css */
 
 .header {
-  position: fixed; /* Fixa o header no topo da tela */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background-color: var(--cor-azul-escuro); /* Cor de fundo do header */
-  color: var(--cor-branco); /* Cor do texto */
-  padding: 0.5rem 1.5rem; /* Padding base para um header fino */
-  z-index: 1000; /* Garante que fique por cima de outros elementos */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra sutil na parte inferior */
-  /* height: var(--header-height); REMOVIDO: A altura será dinâmica pelo padding e conteúdo */
+  background-color: var(--cor-branco); /* Fundo branco para a logo se destacar */
+  color: var(--cor-cinza-escuro); /* Cor de texto escura para contraste */
+  padding: 0.5rem 1.5rem;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra mais sutil */
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  border-bottom: 3px solid var(--cor-azul-claro); /* Detalhe com a cor primária */
 }
 
 .headerContent {
-  max-width: 1280px; /* Alinha com a largura máxima do conteúdo principal */
-  margin: 0 auto; /* Centraliza o conteúdo */
+  max-width: 1280px;
+  margin: 0 auto;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha em telas menores */
-  gap: 1rem; /* Espaçamento entre os blocos (título e usuário) */
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
+/* ========================================================== */
+/* CORREÇÃO APLICADA AQUI: Estilos ajustados para a logo      */
+/* ========================================================== */
 .appTitle {
-  font-size: 1.3rem; /* Título um pouco menor */
-  font-weight: 700;
-  color: var(--cor-branco);
-  text-decoration: none;
-  flex-shrink: 0; /* Impede que o título encolha */
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  max-width: 240px; /* Largura máxima da logo em telas grandes */
 }
 
 .appTitle:hover {
   opacity: 0.9;
 }
 
+/* Garante que a imagem dentro do link seja responsiva */
+.appTitle img {
+  width: 100%;
+  height: auto;
+}
+
+
 .userInfo {
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* Espaçamento mais compacto */
-  flex-wrap: wrap; /* Permite que os itens de usuário quebrem */
-  justify-content: flex-end; /* Alinha à direita */
-  flex-grow: 1; /* Permite que o grupo de usuário ocupe espaço extra */
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex-grow: 1;
 }
 
 .userIcon {
-  font-size: 1rem; /* Ícone menor */
+  font-size: 1rem;
   flex-shrink: 0;
 }
 
@@ -57,7 +66,7 @@
   display: flex;
   flex-direction: column;
   line-height: 1.2;
-  font-size: 0.85rem; /* Informação do usuário menor */
+  font-size: 0.85rem;
   flex-shrink: 0;
 }
 
@@ -66,41 +75,38 @@
 }
 
 .userRole {
-  font-size: 0.7rem; /* Cargo ainda menor */
+  font-size: 0.7rem;
   opacity: 0.8;
 }
 
 .logoutButton {
   background: none;
   border: none;
-  color: var(--cor-branco);
+  color: var(--cor-cinza-escuro); /* Cor do botão de sair ajustada */
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.3rem; /* Espaçamento compacto para o botão Sair */
-  font-size: 0.85rem; /* Botão Sair menor */
+  gap: 0.3rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  transition: opacity 0.2s;
-  padding: 0.3rem 0.5rem; /* Padding do botão Sair mais compacto */
+  transition: all 0.2s;
+  padding: 0.3rem 0.5rem;
   border-radius: 4px;
 }
 
 .logoutButton:hover {
-  opacity: 0.8;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .logoutText {
-  display: inline; /* Visível por padrão em desktop */
+  display: inline;
 }
 
-/* === NOVOS ESTILOS PARA O MENU DE NAVEGAÇÃO === */
-
+/* === MENU DE NAVEGAÇÃO === */
 .navigation {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  /* Centraliza o menu no espaço disponível em telas maiores */
   flex-grow: 1;
   justify-content: center;
 }
@@ -111,7 +117,7 @@
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 6px;
-  color: var(--cor-branco);
+  color: var(--cor-cinza-escuro); /* Cor do link ajustada */
   font-weight: 500;
   font-size: 0.9rem;
   text-decoration: none;
@@ -120,51 +126,50 @@
 }
 
 .navLink:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
-/* Estilo para o link da página ativa */
 .navLinkActive {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: var(--cor-cinza-claro);
+  color: var(--cor-azul-escuro);
   font-weight: 600;
 }
 
 /* --- Media Queries para Responsividade --- */
 
-/* Para telas até 768px (tablets e celulares) */
 @media (max-width: 768px) {
   .header {
-    padding: 0.4rem 1rem; /* Reduz padding em telas médias */
+    padding: 0.4rem 1rem;
   }
 
   .headerContent {
-    flex-direction: column; /* Empilha o título e as informações do usuário verticalmente */
-    align-items: center; /* Centraliza horizontalmente */
-    gap: 0.5rem; /* Espaçamento quando empilhado */
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .appTitle {
-    font-size: 1.2rem; /* Reduz título */
-    margin-bottom: 0.3rem; /* Pequeno espaçamento abaixo do título empilhado */
+    max-width: 200px;
+    margin-bottom: 0.3rem;
   }
 
   .userInfo {
-    width: 100%; /* Ocupa a largura total */
-    justify-content: center; /* Centraliza os itens do usuário */
-    margin-top: 0; /* Remove margem extra */
-    gap: 0.5rem; /* Mantém espaçamento compacto */
+    width: 100%;
+    justify-content: center;
+    margin-top: 0;
+    gap: 0.5rem;
   }
 
   .userNameRole {
     text-align: center;
-    font-size: 0.8rem; /* Torna a informação do usuário mais compacta */
+    font-size: 0.8rem;
   }
   .userRole {
     font-size: 0.65rem;
   }
 
   .userIcon {
-    font-size: 1rem; /* Ícone visível */
+    font-size: 1rem;
   }
 
   .logoutButton {
@@ -172,18 +177,17 @@
     padding: 0.3rem 0.5rem;
   }
   .logoutText {
-    display: none; /* Esconde o texto "Sair" em telas menores, deixando apenas o ícone */
+    display: none;
   }
 }
 
-/* Para telas até 480px (celulares menores) */
 @media (max-width: 480px) {
   .header {
-    padding: 0.3rem 0.75rem; /* Ajuste ainda menor para telas muito pequenas */
+    padding: 0.3rem 0.75rem;
   }
 
   .appTitle {
-    font-size: 1.1rem;
+    max-width: 180px;
   }
 
   .userNameRole {
@@ -194,17 +198,17 @@
   }
 
   .userInfo {
-      flex-direction: column; /* Empilha informações do usuário e botão de sair */
-      gap: 0.2rem; /* Espaçamento mínimo quando tudo está empilhado */
+      flex-direction: column;
+      gap: 0.2rem;
   }
 
   .userIcon {
-      margin-bottom: 0.1rem; /* Pequeno espaço abaixo do ícone se o nome stack */
+      margin-bottom: 0.1rem;
       font-size: 0.9rem;
   }
 
   .logoutButton {
       padding: 0.2rem 0.4rem;
-      font-size: 0.75rem; /* Botão Sair ainda menor */
+      font-size: 0.75rem;
   }
 }

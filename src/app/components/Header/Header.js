@@ -3,17 +3,17 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { FiLogOut, FiUser, FiGrid, FiUsers } from 'react-icons/fi'; // NOVAS IMPORTAÇÕES DE ÍCONES
+import Image from 'next/image'; // Importa o componente de Imagem do Next.js
+import { FiLogOut, FiUser, FiGrid, FiUsers } from 'react-icons/fi';
 import styles from './Header.module.css';
 
 const Header = () => {
   const router = useRouter();
-  const pathname = usePathname(); // HOOK PARA VERIFICAR A ROTA ATIVA
+  const pathname = usePathname();
   const userName = "Usuário RH"; // Mock
   const userRole = "Administrador"; // Mock
 
   const handleLogout = () => {
-    console.log("Usuário deslogado");
     if (typeof window !== 'undefined') {
       localStorage.removeItem('authToken');
     }
@@ -23,12 +23,20 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.headerContent}>
-        {/* TÍTULO DO APP CONTINUA SENDO UM LINK PARA O DASHBOARD */}
+        {/* ========================================================== */}
+        {/* CORREÇÃO APLICADA AQUI: Título de texto substituído pela logo */}
+        {/* ========================================================== */}
         <Link href="/dashboard" className={styles.appTitle}>
-          Sistema RH
+          <Image
+            src="/logo.png" // Caminho para a imagem na pasta /public
+            alt="Logo SEPLAN GOV PI"
+            width={240}
+            height={73}
+            priority // Otimiza o carregamento da logo
+          />
         </Link>
 
-        {/* --- NOVO MENU DE NAVEGAÇÃO ADICIONADO --- */}
+        {/* --- MENU DE NAVEGAÇÃO --- */}
         <nav className={styles.navigation}>
           <Link 
             href="/dashboard" 
@@ -45,8 +53,8 @@ const Header = () => {
             <span>Gerenciar Usuários</span>
           </Link>
         </nav>
-        {/* --- FIM DO NOVO MENU --- */}
 
+        {/* --- INFORMAÇÕES DO USUÁRIO --- */}
         <div className={styles.userInfo}>
           <FiUser className={styles.userIcon} />
           <div className={styles.userNameRole}>

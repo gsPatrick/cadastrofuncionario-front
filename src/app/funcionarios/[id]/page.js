@@ -13,9 +13,9 @@ import Spinner from '../../components/Spinner/Spinner';
 import DocumentUploadForm from '../../components/DocumentUploadForm/DocumentUploadForm';
 import AnnotationForm from '../../components/AnnotationForm/AnnotationForm';
 import EmployeeForm from '../../components/EmployeeForm/EmployeeForm';
-import DocumentEditForm from '../../components/DocumentEditForm/DocumentEditForm'; // <-- NOVO IMPORT
+import DocumentEditForm from '../../components/DocumentEditForm/DocumentEditForm';
 
-// Mapeamento de nomes de campos para nomes amigáveis para a aba de detalhes
+// Mapeamento de nomes de campos para nomes amigáveis
 const fieldDisplayNames = {
   fullName: 'Nome Completo',
   registrationNumber: 'Matrícula',
@@ -62,18 +62,17 @@ export default function FuncionarioDetailsPage() {
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('details'); // details, documents, annotations, history
+  const [activeTab, setActiveTab] = useState('details');
   
   // Estados dos Modais
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isAnnotationModalOpen, setIsAnnotationModalOpen] = useState(false);
   const [editingAnnotation, setEditingAnnotation] = useState(null);
   const [isEditEmployeeModalOpen, setIsEditEmployeeModalOpen] = useState(false);
-  // NOVOS ESTADOS PARA EDIÇÃO DE DOCUMENTOS
-  const [isEditDocumentModalOpen, setIsEditDocumentModalOpen] = useState(false); // <-- NOVO
-  const [editingDocument, setEditingDocument] = useState(null); // <-- NOVO
+  const [isEditDocumentModalOpen, setIsEditDocumentModalOpen] = useState(false);
+  const [editingDocument, setEditingDocument] = useState(null);
   
-  // Novos estados para a pesquisa
+  // Estados para pesquisa
   const [documentSearchTerm, setDocumentSearchTerm] = useState('');
   const [annotationSearchTerm, setAnnotationSearchTerm] = useState('');
   
@@ -81,7 +80,6 @@ export default function FuncionarioDetailsPage() {
   const router = useRouter();
   const { id: employeeId } = params;
 
-  // Constrói a URL base do servidor para os links de download
   const serverRootUrl = API_BASE_URL.replace('/api', '');
 
   const fetchData = useCallback(async () => {
@@ -90,17 +88,29 @@ export default function FuncionarioDetailsPage() {
     setError('');
     
     try {
-      const employeeRes = await fetch(`${API_BASE_URL}/employees/${employeeId}`, { headers: getAuthHeaders() });
-      if (employeeRes.status === 401) return router.push('/login');
-      if (!employeeRes.ok) throw new Error('Falha ao buscar dados do funcionário.');
+      const [employeeRes, historyRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/employees/${employeeId}`, { headers: getAuthHeaders() }),
+        fetch(`${API_BASE_URL}/employees/${employeeId}/history`, { headers: getAuthHeaders() })
+      ]);
+
+      if (employeeRes.status === 401) {
+        router.push('/login');
+        return;
+      }
+      if (!employeeRes.ok) {
+        const errorData = await employeeRes.json();
+        throw new Error(errorData.message || 'Falha ao buscar dados do funcionário.');
+      }
       const employeeData = await employeeRes.json();
       setEmployee(employeeData.data.employee);
 
-      const historyRes = await fetch(`${API_BASE_URL}/employees/${employeeId}/history`, { headers: getAuthHeaders() });
-      if (!historyRes.ok) throw new Error('Falha ao buscar histórico do funcionário.');
-      const historyData = await historyRes.json();
-      setHistory(historyData.data.history);
-
+      if (historyRes.ok) {
+        const historyData = await historyRes.json();
+        setHistory(historyData.data.history);
+      } else {
+        console.warn('Não foi possível carregar o histórico do funcionário.');
+        setHistory([]);
+      }
     } catch (err) {
       setError(err.message);
       console.error(err);
@@ -111,7 +121,7 @@ export default function FuncionarioDetailsPage() {
 
   useEffect(() => {
     if (employeeId) {
-        fetchData();
+      fetchData();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [employeeId]);
@@ -191,16 +201,19 @@ export default function FuncionarioDetailsPage() {
     }
   };
   
-  // NOVO: ABRIR MODAL DE EDIÇÃO DE DOCUMENTO
   const handleOpenEditDocumentModal = (document) => { 
     setEditingDocument(document);
     setIsEditDocumentModalOpen(true);
   };
 
-  // NOVO: ENVIAR EDIÇÃO DE DOCUMENTO
   const handleEditDocumentSubmit = async (formData) => { 
+    if (!editingDocument) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/documents/${editingDocument.id}`, {
+      // ==========================================================
+      // CORREÇÃO APLICADA AQUI: A URL da API foi ajustada para a rota correta.
+      // ==========================================================
+      const url = `${API_BASE_URL}/employees/${employeeId}/documents/${editingDocument.id}`;
+      const response = await fetch(url, {
         method: 'PUT',
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -223,7 +236,11 @@ export default function FuncionarioDetailsPage() {
   const handleDeleteDocument = async (documentId) => {
     if (confirm('Tem certeza que deseja excluir este documento?')) {
       try {
-        const response = await fetch(`${API_BASE_URL}/documents/${documentId}`, {
+        // ==========================================================
+        // CORREÇÃO APLICADA AQUI: A URL da API foi ajustada para a rota correta.
+        // ==========================================================
+        const url = `${API_BASE_URL}/employees/${employeeId}/documents/${documentId}`;
+        const response = await fetch(url, {
           method: 'DELETE',
           headers: getAuthHeaders(),
         });
@@ -360,7 +377,9 @@ export default function FuncionarioDetailsPage() {
               .map(([key, value]) => (
               <div key={key} className={styles.detailItem}>
                 <strong className={styles.detailLabel}>{fieldDisplayNames[key] || key}</strong>
-                <span className={styles.detailValue}>{String(value) || '-'}</span>
+                <span className={styles.detailValue}>
+                  {value !== null && value !== undefined && value !== '' ? String(value) : '-'}
+                </span>
               </div>
             ))}
           </div>
@@ -386,32 +405,29 @@ export default function FuncionarioDetailsPage() {
               <ul className={styles.list}>
                 {filteredDocuments.map(doc => (
                   <li key={doc.id} className={styles.listItem}>
-                    {/* Link para download */}
                     <a 
                       href={`${serverRootUrl}/${doc.filePath}`} 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       download 
-                      className={styles.documentLinkContent} // Novo estilo para o conteúdo clicável do link
+                      className={styles.documentLinkContent}
                     >
                       <FiFileText className={styles.listIcon} />
                       <div className={styles.listItemContent}>
                         <strong>{doc.documentType}</strong>
                         <span>{doc.description || 'Sem descrição'}</span>
-                        <small>Enviado em: {new Date(doc.createdAt).toLocaleString('pt-BR')}</small> {/* <-- MUDANÇA: de uploadedAt para createdAt */}
-                        {doc.updatedAt && doc.createdAt !== doc.updatedAt && (
-                          <small>Última Edição: {new Date(doc.updatedAt).toLocaleString('pt-BR')}</small>
-                        )}
+                        {/* ========================================================== */}
+                        {/* CORREÇÃO APLICADA AQUI: Usando 'uploadedAt' para a data     */}
+                        {/* ========================================================== */}
+                        <small>Enviado em: {new Date(doc.uploadedAt).toLocaleString('pt-BR')}</small>
                       </div>
                     </a>
-                    <div className={styles.listItemActions}> {/* Botões de ação fora do link de download */}
-                        <button className={styles.editButton} onClick={() => handleOpenEditDocumentModal(doc)}><FiEdit /></button> {/* <-- NOVO BOTÃO DE EDIÇÃO */}
+                    <div className={styles.listItemActions}>
+                        <button className={styles.editButton} onClick={() => handleOpenEditDocumentModal(doc)} title="Editar Metadados"><FiEdit /></button>
                         <button 
                           className={styles.deleteButton} 
-                          onClick={(e) => {
-                            e.stopPropagation(); // Evita que o clique no botão ative o link pai
-                            handleDeleteDocument(doc.id);
-                          }}
+                          onClick={() => handleDeleteDocument(doc.id)}
+                          title="Excluir Documento"
                         >
                           <FiTrash2 />
                         </button>
@@ -448,7 +464,7 @@ export default function FuncionarioDetailsPage() {
                       <strong>{note.title}</strong>
                       <span>{note.content}</span>
                       <small><strong>Categoria:</strong> {note.category} | <strong>Criado em:</strong> {new Date(note.annotationDate).toLocaleString('pt-BR')}</small>
-                      {note.updatedAt && note.createdAt !== note.updatedAt && ( // Mostrar data de atualização se houver e for diferente
+                      {note.updatedAt && new Date(note.updatedAt) > new Date(note.annotationDate) && (
                         <small>Última Edição: {new Date(note.updatedAt).toLocaleString('pt-BR')}</small>
                       )}
                     </div>
@@ -492,7 +508,7 @@ export default function FuncionarioDetailsPage() {
       <Modal isOpen={isUploadModalOpen} onClose={() => setIsUploadModalOpen(false)} title="Enviar Documentos">
         <DocumentUploadForm onSubmit={handleUploadSubmit} onCancel={() => setIsUploadModalOpen(false)} />
       </Modal>
-      {/* NOVO MODAL PARA EDIÇÃO DE DOCUMENTOS */}
+      
       <Modal isOpen={isEditDocumentModalOpen} onClose={() => setIsEditDocumentModalOpen(false)} title="Editar Metadados do Documento">
         <DocumentEditForm initialData={editingDocument} onSubmit={handleEditDocumentSubmit} onCancel={() => setIsEditDocumentModalOpen(false)} />
       </Modal>
@@ -500,6 +516,7 @@ export default function FuncionarioDetailsPage() {
       <Modal isOpen={isAnnotationModalOpen} onClose={() => setIsAnnotationModalOpen(false)} title={editingAnnotation ? 'Editar Anotação' : 'Nova Anotação'}>
         <AnnotationForm initialData={editingAnnotation} onSubmit={handleAnnotationSubmit} onCancel={() => setIsAnnotationModalOpen(false)} />
       </Modal>
+      
       <Modal isOpen={isEditEmployeeModalOpen} onClose={() => setIsEditEmployeeModalOpen(false)} title="Editar Dados do Funcionário">
         <EmployeeForm 
           employeeData={employee} 

@@ -10,11 +10,31 @@
   --cor-verde: #3D6B35;
   --cor-vermelho: #FF4D4F;
   --cor-amarelo: #FFC640;
-  --header-height: 3rem; /* AJUSTADO: Nova altura do Header (era 4rem) */
 
+  /* ========================================================== */
+  /* CORREÇÃO APLICADA AQUI: Variáveis dinâmicas de altura      */
+  /* ========================================================== */
+  --header-height: 85px;  /* Altura padrão para desktop */
+  --footer-height: 35px;  /* Altura padrão do rodapé */
+  
   /* Tipografia Base */
   --font-sans-serif: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 }
+
+/* Ajusta a altura do header para telas de tablet */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 140px;
+  }
+}
+
+/* Ajusta a altura do header para telas de celular */
+@media (max-width: 480px) {
+  :root {
+    --header-height: 160px;
+  }
+}
+
 
 * {
   box-sizing: border-box;

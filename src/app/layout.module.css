@@ -6,28 +6,20 @@
   min-height: 100vh;
 }
 
+/* ========================================================== */
+/* CORREÇÃO APLICADA AQUI: Espaçamento extra adicionado       */
+/* ========================================================== */
 .mainContentWrapper {
   flex-grow: 1;
-  padding-top: var(--header-height); /* Padding para o Header fixo */
-  padding-bottom: var(--footer-height); /* Padding para o Footer fixo */
   width: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-}
 
-/* --- Media Queries para o layout.module.css --- */
-/* Ajustar padding-top do mainContentWrapper para as novas alturas do header em cada breakpoint */
-
-@media (max-width: 768px) {
-  .mainContentWrapper {
-    /* Altura aproximada do header em 768px é (0.4rem * 2) + conteúdo empilhado, digamos 4.5rem */
-    padding-top: 4.5rem; 
-  }
-}
-
-@media (max-width: 480px) {
-  .mainContentWrapper {
-    /* Altura aproximada do header em 480px é (0.3rem * 2) + conteúdo empilhado, digamos 5.5rem */
-    padding-top: 5.5rem; 
-  }
+  /*
+    Usa a função calc() para pegar a altura do header/footer (definida em globals.css)
+    e SOMAR um espaçamento extra para criar um respiro visual.
+    Isso mantém a responsividade e evita que o conteúdo fique "colado".
+  */
+  padding-top: calc(var(--header-height) + 2rem);    /* Espaço para o Header + 32px de margem */
+  padding-bottom: calc(var(--footer-height) + 1rem); /* Espaço para o Footer + 16px de margem */
 }
