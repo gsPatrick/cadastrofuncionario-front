@@ -307,6 +307,250 @@
   color: var(--cor-azul-escuro);
 }
 
+/* app/funcionarios/[id]/details.module.css */
+
+/* ... (Estilos existentes: .pageContainer, .profileHeader, etc.) */
+
+/* Documents & Annotations Tabs */
+.contentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap; /* Permite que os itens quebrem linha */
+  gap: 1rem; /* Espaçamento entre os itens quando quebram linha */
+}
+
+/* ========================================================== */
+/* NOVOS ESTILOS PARA A BARRA DE PESQUISA                     */
+/* ========================================================== */
+.searchWrapper {
+  position: relative;
+  flex-grow: 1; /* Faz a barra de pesquisa ocupar o espaço disponível */
+  min-width: 250px; /* Largura mínima para evitar que fique muito pequena */
+  order: 1; /* Ordem padrão */
+}
+
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: var(--cor-cinza-escuro);
+  pointer-events: none; /* Permite clicar através do ícone */
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.7rem 1rem 0.7rem 2.5rem; /* Padding esquerdo para o ícone */
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--cor-azul-claro);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+
+/* app/funcionarios/[id]/details.module.css */
+
+/* ... (Estilos existentes) ... */
+
+/* Documents & Annotations Tabs */
+.contentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap; /* Permite que os itens quebrem linha */
+  gap: 1rem; /* Espaçamento entre os itens quando quebram linha */
+}
+
+/* ========================================================== */
+/* ESTILOS PARA A BARRA DE PESQUISA (EXISTENTE)               */
+/* ========================================================== */
+.searchWrapper {
+  position: relative;
+  flex-grow: 1; 
+  min-width: 250px; 
+  order: 1; 
+}
+
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: var(--cor-cinza-escuro);
+  pointer-events: none; 
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.7rem 1rem 0.7rem 2.5rem; 
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--cor-azul-claro);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.actionButton {
+  order: 2; 
+  flex-shrink: 0; 
+}
+
+/* ========================================================== */
+/* AJUSTES PARA LISTA DE DOCUMENTOS E ANOTAÇÕES               */
+/* ========================================================== */
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.listItem {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.listItem:hover {
+  border-color: var(--cor-azul-claro);
+  background-color: #fcfcfc;
+}
+
+/* Novo estilo para o conteúdo clicável do documento (link de download) */
+.documentLinkContent {
+  display: flex; /* Para alinhar ícone e conteúdo */
+  flex-grow: 1; /* Para que o link ocupe o máximo de espaço */
+  gap: 1rem;
+  align-items: flex-start;
+  text-decoration: none; /* Remover sublinhado padrão do link */
+  color: inherit; /* Manter a cor do texto do pai */
+  cursor: pointer;
+}
+
+.listIcon {
+  color: var(--cor-azul-claro);
+  font-size: 1.5rem;
+  margin-top: 0.25rem;
+  flex-shrink: 0; /* Impedir que o ícone encolha */
+}
+
+.listItemContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  word-break: break-word;
+}
+.listItemContent strong {
+  color: var(--cor-azul-escuro);
+}
+.listItemContent small {
+  color: var(--cor-cinza-escuro);
+  font-size: 0.8rem;
+}
+
+.listItemActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0; /* Impedir que os botões encolham */
+  align-items: center; /* Centraliza os botões verticalmente */
+}
+
+.editButton, .deleteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.editButton:hover { color: var(--cor-branco); background-color: var(--cor-amarelo); }
+.deleteButton:hover { color: var(--cor-branco); background-color: var(--cor-vermelho); }
+
+.emptyState {
+  text-align: center;
+  padding: 2rem;
+  color: var(--cor-cinza-escuro);
+}
+
+/* History Tab */
+/* ... (existing .historyTable) ... */
+
+/* --- NOVAS CLASSES PARA BOTÕES DO HEADER --- */
+/* ... (existing .profileActions, .editHeaderBtn, .deleteHeaderBtn) ... */
+
+/* === NOVOS ESTILOS PARA O BOTÃO DE VOLTAR E SEU CONTAINER === */
+/* ... (existing .pageHeaderActions, .backButton) ... */
+
+@media (max-width: 768px) {
+  /* ... (media queries existentes) ... */
+  .contentHeader {
+    flex-direction: column;
+    align-items: stretch; 
+  }
+
+  .searchWrapper {
+    order: 2; 
+  }
+
+  .actionButton {
+    order: 3; 
+    width: 100%; 
+    justify-content: center;
+  }
+}
+
+.actionButton {
+  /* ... (estilos existentes) */
+  order: 2; /* Botão sempre vem depois da pesquisa */
+  flex-shrink: 0; /* Impede que o botão encolha */
+}
+
+/* ... (Restante dos estilos: .list, .listItem, .emptyState, etc.) */
+
+/* --- NOVAS CLASSES PARA BOTÕES DO HEADER --- */
+/* ... (Estilos existentes) */
+
+@media (max-width: 768px) {
+  /* ... (media queries existentes) */
+  .contentHeader {
+    flex-direction: column;
+    align-items: stretch; /* Alinha os itens para preencher a largura */
+  }
+
+  .searchWrapper {
+    order: 2; /* Pesquisa vem depois do título em mobile */
+  }
+
+  .actionButton {
+    order: 3; /* Botão de ação vem por último */
+    width: 100%; /* Ocupa a largura total */
+    justify-content: center;
+  }
+}
+
 @media (max-width: 768px) {
   .pageContainer { padding: 1rem; }
   .profileHeader { flex-direction: column; text-align: center; }

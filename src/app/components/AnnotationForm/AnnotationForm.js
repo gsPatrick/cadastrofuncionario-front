@@ -4,10 +4,22 @@ import { useState, useEffect } from 'react';
 import styles from './AnnotationForm.module.css';
 
 const AnnotationForm = ({ initialData = null, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({ titulo: '', categoria: '', conteudo: '' });
+  // Define o estado inicial com os nomes de campos que o frontend usa
+  const [formData, setFormData] = useState({
+    titulo: initialData?.title || '',
+    categoria: initialData?.category || 'Informativo', // Valor padrão para o select
+    conteudo: initialData?.content || ''
+  });
 
+  // Atualiza o formulário se um 'initialData' for passado (para edição)
   useEffect(() => {
-    if (initialData) setFormData(initialData);
+    if (initialData) {
+      setFormData({
+        titulo: initialData.title || '',
+        categoria: initialData.category || 'Informativo',
+        conteudo: initialData.content || ''
+      });
+    }
   }, [initialData]);
 
   const handleChange = (e) => {
@@ -17,6 +29,8 @@ const AnnotationForm = ({ initialData = null, onSubmit, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // O 'onSubmit' já espera os campos 'titulo', 'conteudo', 'categoria'
+    // pois o controller do backend fará o mapeamento.
     onSubmit(formData);
   };
 
@@ -24,15 +38,47 @@ const AnnotationForm = ({ initialData = null, onSubmit, onCancel }) => {
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.inputGroup}>
         <label htmlFor="titulo">Título</label>
-        <input type="text" id="titulo" name="titulo" value={formData.titulo} onChange={handleChange} required />
+        <input 
+          type="text" 
+          id="titulo" 
+          name="titulo" 
+          value={formData.titulo} 
+          onChange={handleChange} 
+          required 
+        />
       </div>
+      
+      {/* ========================================================== */}
+      {/* ALTERAÇÃO PRINCIPAL: Campo de texto trocado por um select  */}
+      {/* ========================================================== */}
       <div className={styles.inputGroup}>
         <label htmlFor="categoria">Categoria</label>
-        <input type="text" id="categoria" name="categoria" value={formData.categoria} onChange={handleChange} />
+        <select 
+          id="categoria" 
+          name="categoria" 
+          value={formData.categoria} 
+          onChange={handleChange}
+          required
+          className={styles.selectInput} // Adicionando uma classe para estilização se necessário
+        >
+          <option value="Informativo">Informativo</option>
+          <option value="Advertência">Advertência</option>
+          <option value="Comunicação">Comunicação</option>
+          <option value="Elogio">Elogio</option>
+          <option value="Outros">Outros</option>
+        </select>
       </div>
+      
       <div className={styles.inputGroup}>
         <label htmlFor="conteudo">Conteúdo</label>
-        <textarea id="conteudo" name="conteudo" value={formData.conteudo} onChange={handleChange} rows="4" required />
+        <textarea 
+          id="conteudo" 
+          name="conteudo" 
+          value={formData.conteudo} 
+          onChange={handleChange} 
+          rows="4" 
+          required 
+        />
       </div>
       <div className={styles.buttonContainer}>
         <button type="button" className={styles.cancelButton} onClick={onCancel}>Cancelar</button>
