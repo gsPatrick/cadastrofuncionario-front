@@ -291,17 +291,7 @@ export default function DashboardPage() {
       </header>
 
       <div className={styles.contentCard}>
-        <div className={styles.searchWrapper}>
-             <FiSearch className={styles.searchIcon} />
-             <input
-               type="text"
-               placeholder="Busca rápida por nome, matrícula, cargo, CPF..."
-               className={styles.searchInput}
-               value={searchTerm}
-               onChange={(e) => setSearchTerm(e.target.value)}
-             />
-        </div>
-
+            
         {showFilters && (
           <div className={styles.filtersWrapper}>
             <div className={styles.filtersHeader}>
