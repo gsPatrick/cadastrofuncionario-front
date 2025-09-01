@@ -3,18 +3,18 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import styles from './login.module.css';
-import { API_BASE_URL } from '../../utils/api'; // IMPORTADO
+import { API_BASE_URL } from '../../utils/api';
+import { useAuth } from '../context/AuthContext'; // Importa o hook de autenticação
 
 export default function LoginPage() {
   const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // NOVO ESTADO: Loading
-  const [error, setError] = useState(''); // NOVO ESTADO: Erro
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const auth = useAuth(); // Usa o contexto de autenticação
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -34,13 +34,9 @@ export default function LoginPage() {
         throw new Error(data.message || 'Erro ao tentar fazer login.');
       }
 
-      // Salva o token no localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('authToken', data.token);
-      }
+      // Usa a função de login do contexto para centralizar a lógica
+      auth.login(data.token, data.data.user);
       
-      console.log('Login bem-sucedido, redirecionando...');
-      router.push('/dashboard');
     } catch (err) {
       setError(err.message);
       console.error('Falha no login:', err);
@@ -55,7 +51,6 @@ export default function LoginPage() {
         <h1 className={styles.title}>Sistema de Gestão de Funcionários</h1>
         
         <form onSubmit={handleSubmit} className={styles.form}>
-          {/* ... campos de input (sem alterações) ... */}
           <div className={styles.inputGroup}>
             <label htmlFor="usuario">Usuário</label>
             <input type="text" id="usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} required disabled={isLoading} />
@@ -71,7 +66,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {error && <p className={styles.errorMessage}>{error}</p>} {/* Exibe mensagem de erro */}
+          {error && <p className={styles.errorMessage}>{error}</p>}
 
           <button type="submit" className={styles.button} disabled={isLoading}>
             {isLoading ? 'Entrando...' : 'Entrar'}

@@ -1,4 +1,3 @@
-// app/funcionarios/[id]/page.js
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -6,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { FiUser, FiFileText, FiMessageSquare, FiClock, FiUpload, FiPlus, FiEdit, FiTrash2, FiArrowLeft, FiSearch } from 'react-icons/fi';
 import styles from './details.module.css';
 import { API_BASE_URL, getAuthHeaders } from '../../../utils/api';
+import { useAuth } from '../../../context/AuthContext'; // 1. IMPORTAR O useAuth
 
 // Componentes Reutilizáveis
 import Modal from '../../components/Modal/Modal';
@@ -79,6 +79,9 @@ export default function FuncionarioDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { id: employeeId } = params;
+
+  // 2. OBTER O HOOK DE AUTENTICAÇÃO
+  const { hasPermission } = useAuth();
 
   const serverRootUrl = API_BASE_URL.replace('/api', '');
 
@@ -209,9 +212,6 @@ export default function FuncionarioDetailsPage() {
   const handleEditDocumentSubmit = async (formData) => { 
     if (!editingDocument) return;
     try {
-      // ==========================================================
-      // CORREÇÃO APLICADA AQUI: A URL da API foi ajustada para a rota correta.
-      // ==========================================================
       const url = `${API_BASE_URL}/employees/${employeeId}/documents/${editingDocument.id}`;
       const response = await fetch(url, {
         method: 'PUT',
@@ -236,9 +236,6 @@ export default function FuncionarioDetailsPage() {
   const handleDeleteDocument = async (documentId) => {
     if (confirm('Tem certeza que deseja excluir este documento?')) {
       try {
-        // ==========================================================
-        // CORREÇÃO APLICADA AQUI: A URL da API foi ajustada para a rota correta.
-        // ==========================================================
         const url = `${API_BASE_URL}/employees/${employeeId}/documents/${documentId}`;
         const response = await fetch(url, {
           method: 'DELETE',
@@ -354,9 +351,20 @@ export default function FuncionarioDetailsPage() {
             <strong>Matrícula:</strong> {employee.registrationNumber} | <strong>Cargo:</strong> {employee.position}
           </p>
         </div>
+        {/* ========================================================== */}
+        {/* 3. APLICAÇÃO DAS PERMISSÕES NOS BOTÕES DE AÇÃO PRINCIPAIS */}
+        {/* ========================================================== */}
         <div className={styles.profileActions}>
-          <button className={styles.editHeaderBtn} onClick={() => setIsEditEmployeeModalOpen(true)}><FiEdit /> Editar Dados</button>
-          <button className={styles.deleteHeaderBtn} onClick={handleDeleteEmployee}><FiTrash2 /> Excluir Funcionário</button>
+          {hasPermission('employee:edit') && (
+            <button className={styles.editHeaderBtn} onClick={() => setIsEditEmployeeModalOpen(true)}>
+              <FiEdit /> Editar Dados
+            </button>
+          )}
+          {hasPermission('employee:delete') && (
+            <button className={styles.deleteHeaderBtn} onClick={handleDeleteEmployee}>
+              <FiTrash2 /> Excluir Funcionário
+            </button>
+          )}
         </div>
       </header>
 
@@ -399,7 +407,12 @@ export default function FuncionarioDetailsPage() {
                   onChange={(e) => setDocumentSearchTerm(e.target.value)}
                 />
               </div>
-              <button className={styles.actionButton} onClick={() => setIsUploadModalOpen(true)}><FiUpload /> Fazer Upload</button>
+              {/* 4. APLICAÇÃO DA PERMISSÃO NO BOTÃO DE UPLOAD */}
+              {hasPermission('document:create') && (
+                <button className={styles.actionButton} onClick={() => setIsUploadModalOpen(true)}>
+                  <FiUpload /> Fazer Upload
+                </button>
+              )}
             </div>
             {filteredDocuments.length > 0 ? (
               <ul className={styles.list}>
@@ -416,21 +429,19 @@ export default function FuncionarioDetailsPage() {
                       <div className={styles.listItemContent}>
                         <strong>{doc.documentType}</strong>
                         <span>{doc.description || 'Sem descrição'}</span>
-                        {/* ========================================================== */}
-                        {/* CORREÇÃO APLICADA AQUI: Usando 'uploadedAt' para a data     */}
-                        {/* ========================================================== */}
                         <small>Enviado em: {new Date(doc.uploadedAt).toLocaleString('pt-BR')}</small>
                       </div>
                     </a>
+                    {/* 5. APLICAÇÃO DAS PERMISSÕES NOS BOTÕES DE AÇÃO DO ITEM */}
                     <div className={styles.listItemActions}>
-                        <button className={styles.editButton} onClick={() => handleOpenEditDocumentModal(doc)} title="Editar Metadados"><FiEdit /></button>
-                        <button 
-                          className={styles.deleteButton} 
-                          onClick={() => handleDeleteDocument(doc.id)}
-                          title="Excluir Documento"
-                        >
-                          <FiTrash2 />
-                        </button>
+                        {hasPermission('document:edit') && (
+                          <button className={styles.editButton} onClick={() => handleOpenEditDocumentModal(doc)} title="Editar Metadados"><FiEdit /></button>
+                        )}
+                        {hasPermission('document:delete') && (
+                          <button className={styles.deleteButton} onClick={() => handleDeleteDocument(doc.id)} title="Excluir Documento">
+                            <FiTrash2 />
+                          </button>
+                        )}
                     </div>
                   </li>
                 ))}
@@ -453,7 +464,12 @@ export default function FuncionarioDetailsPage() {
                   onChange={(e) => setAnnotationSearchTerm(e.target.value)}
                 />
               </div>
-              <button className={styles.actionButton} onClick={() => handleOpenAnnotationModal()}><FiPlus /> Nova Anotação</button>
+              {/* 6. APLICAÇÃO DA PERMISSÃO NO BOTÃO DE NOVA ANOTAÇÃO */}
+              {hasPermission('annotation:create') && (
+                <button className={styles.actionButton} onClick={() => handleOpenAnnotationModal()}>
+                  <FiPlus /> Nova Anotação
+                </button>
+              )}
             </div>
             {filteredAnnotations.length > 0 ? (
               <ul className={styles.list}>
@@ -468,9 +484,14 @@ export default function FuncionarioDetailsPage() {
                         <small>Última Edição: {new Date(note.updatedAt).toLocaleString('pt-BR')}</small>
                       )}
                     </div>
+                    {/* 7. APLICAÇÃO DAS PERMISSÕES NOS BOTÕES DE AÇÃO DO ITEM */}
                     <div className={styles.listItemActions}>
-                      <button className={styles.editButton} onClick={() => handleOpenAnnotationModal(note)}><FiEdit /></button>
-                      <button className={styles.deleteButton} onClick={() => handleDeleteAnnotation(note.id)}><FiTrash2 /></button>
+                      {hasPermission('annotation:edit') && (
+                        <button className={styles.editButton} onClick={() => handleOpenAnnotationModal(note)}><FiEdit /></button>
+                      )}
+                      {hasPermission('annotation:delete') && (
+                        <button className={styles.deleteButton} onClick={() => handleDeleteAnnotation(note.id)}><FiTrash2 /></button>
+                      )}
                     </div>
                   </li>
                 ))}

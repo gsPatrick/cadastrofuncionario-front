@@ -1,0 +1,44 @@
+/* app/components/PermissionDeniedModal/PermissionDeniedModal.module.css */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.icon {
+  color: var(--cor-vermelho);
+  margin-bottom: 0.5rem;
+}
+
+.message {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--cor-azul-escuro);
+}
+
+.description {
+  font-size: 0.95rem;
+  color: var(--cor-cinza-escuro);
+  max-width: 400px;
+}
+
+.closeButton {
+  margin-top: 1.5rem;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--cor-azul-claro);
+  color: var(--cor-branco);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: #3a7bc8;
+}
