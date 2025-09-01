@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { FiUser, FiFileText, FiMessageSquare, FiClock, FiUpload, FiPlus, FiEdit, FiTrash2, FiArrowLeft, FiSearch } from 'react-icons/fi';
 import styles from './details.module.css';
 import { API_BASE_URL, getAuthHeaders } from '../../../utils/api';
-import { useAuth } from '../../../context/AuthContext'; // 1. IMPORTAR O useAuth
+import { useAuth } from '../../context/AuthContext'; // 1. IMPORTAR O useAuth
 
 // Componentes Reutilizáveis
 import Modal from '../../components/Modal/Modal';
