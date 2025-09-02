@@ -9,21 +9,40 @@
   padding: 1rem;
 }
 
-.formWrapper {
+/* ========================================================== */
+/* NOVOS ESTILOS PARA O CONTAINER DA LOGO E FORMULÁRIO        */
+/* ========================================================== */
+.loginBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem; /* Espaço entre a logo e o card do formulário */
   width: 100%;
   max-width: 400px;
+}
+
+.logoContainer {
+  transition: transform 0.3s ease;
+}
+
+.logoContainer:hover {
+  transform: scale(1.05);
+}
+
+.formWrapper {
+  width: 100%;
   padding: 2.5rem;
   background-color: var(--cor-branco);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  text-align: center;
 }
 
+/* O título foi removido do JSX, este estilo pode ser removido se não for usado em outro lugar */
 .title {
   color: var(--cor-azul-escuro);
   margin-bottom: 2rem;
   font-size: 1.5rem;
-  font-weight: 700; /* Corresponde a 'bold' */
+  font-weight: 700;
 }
 
 .form {
@@ -41,7 +60,7 @@
 
 .inputGroup label {
   font-size: 0.9rem;
-  font-weight: 600; /* Sans-serif regular/boldish */
+  font-weight: 600;
 }
 
 .inputGroup input {
@@ -76,6 +95,16 @@
   font-size: 1.2rem;
 }
 
+.errorMessage {
+  color: var(--cor-vermelho);
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  padding: 0.75rem;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
 .button {
   padding: 0.9rem;
   border: none;
@@ -83,14 +112,19 @@
   background-color: var(--cor-azul-claro);
   color: var(--cor-branco);
   font-size: 1rem;
-  font-weight: 600; /* Sans-serif regular/boldish */
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
   margin-top: 1rem;
 }
 
-.button:hover {
-  background-color: #3a7bc8; /* Um tom um pouco mais escuro do azul-claro */
+.button:hover:not(:disabled) {
+  background-color: #3a7bc8;
+}
+
+.button:disabled {
+  background-color: #9fbfdf;
+  cursor: not-allowed;
 }
 
 .link {
@@ -99,6 +133,8 @@
   color: var(--cor-cinza-escuro);
   font-size: 0.9rem;
   text-decoration: underline;
+  text-align: center;
+  width: 100%;
 }
 
 .link:hover {

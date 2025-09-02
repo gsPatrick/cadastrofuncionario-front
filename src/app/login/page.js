@@ -1,12 +1,13 @@
-// app/login/page.js
 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image'; // Importado para usar a logo
+import { useRouter } from 'next/navigation';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import styles from './login.module.css';
 import { API_BASE_URL } from '../../utils/api';
-import { useAuth } from '../context/AuthContext'; // Importa o hook de autenticação
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
   const [usuario, setUsuario] = useState('');
@@ -14,7 +15,8 @@ export default function LoginPage() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const auth = useAuth(); // Usa o contexto de autenticação
+  const auth = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -34,9 +36,7 @@ export default function LoginPage() {
         throw new Error(data.message || 'Erro ao tentar fazer login.');
       }
 
-      // Usa a função de login do contexto para centralizar a lógica
       auth.login(data.token, data.data.user);
-      
     } catch (err) {
       setError(err.message);
       console.error('Falha no login:', err);
@@ -47,35 +47,50 @@ export default function LoginPage() {
 
   return (
     <main className={styles.container}>
-      <div className={styles.formWrapper}>
-        <h1 className={styles.title}>Sistema de Gestão de Funcionários</h1>
-        
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="usuario">Usuário</label>
-            <input type="text" id="usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} required disabled={isLoading} />
-          </div>
+      {/* ========================================================== */}
+      {/* ESTRUTURA ALTERADA AQUI                                    */}
+      {/* Novo container para agrupar a logo e o formulário.       */}
+      {/* ========================================================== */}
+      <div className={styles.loginBox}>
+        <div className={styles.logoContainer}>
+          <Image
+            src="/logo.png"
+            alt="Logo SEPLAN GOV PI"
+            width={220} // Ajuste de tamanho para a página de login
+            height={67}
+            priority
+          />
+        </div>
 
-          <div className={styles.inputGroup}>
-            <label htmlFor="senha">Senha</label>
-            <div className={styles.passwordWrapper}>
-              <input type={mostrarSenha ? 'text' : 'password'} id="senha" value={senha} onChange={(e) => setSenha(e.target.value)} required disabled={isLoading} />
-              <span className={styles.eyeIcon} onClick={() => setMostrarSenha(!mostrarSenha)}>
-                {mostrarSenha ? <FiEyeOff /> : <FiEye />}
-              </span>
+        <div className={styles.formWrapper}>
+          {/* O título h1 foi removido para dar destaque à logo */}
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="usuario">Usuário</label>
+              <input type="text" id="usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} required disabled={isLoading} />
             </div>
-          </div>
 
-          {error && <p className={styles.errorMessage}>{error}</p>}
+            <div className={styles.inputGroup}>
+              <label htmlFor="senha">Senha</label>
+              <div className={styles.passwordWrapper}>
+                <input type={mostrarSenha ? 'text' : 'password'} id="senha" value={senha} onChange={(e) => setSenha(e.target.value)} required disabled={isLoading} />
+                <span className={styles.eyeIcon} onClick={() => setMostrarSenha(!mostrarSenha)}>
+                  {mostrarSenha ? <FiEyeOff /> : <FiEye />}
+                </span>
+              </div>
+            </div>
 
-          <button type="submit" className={styles.button} disabled={isLoading}>
-            {isLoading ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
+            {error && <p className={styles.errorMessage}>{error}</p>}
 
-        <Link href="/recuperar-senha" className={styles.link}>
-          Esqueceu a senha?
-        </Link>
+            <button type="submit" className={styles.button} disabled={isLoading}>
+              {isLoading ? 'Entrando...' : 'Entrar'}
+            </button>
+          </form>
+
+          <Link href="/recuperar-senha" className={styles.link}>
+            Esqueceu a senha?
+          </Link>
+        </div>
       </div>
     </main>
   );
