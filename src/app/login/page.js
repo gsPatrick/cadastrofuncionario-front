@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image'; // Importado para usar a logo
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import styles from './login.module.css';
@@ -47,33 +47,49 @@ export default function LoginPage() {
 
   return (
     <main className={styles.container}>
-      {/* ========================================================== */}
-      {/* ESTRUTURA ALTERADA AQUI                                    */}
-      {/* Novo container para agrupar a logo e o formulário.       */}
-      {/* ========================================================== */}
       <div className={styles.loginBox}>
         <div className={styles.logoContainer}>
           <Image
             src="/logo.png"
             alt="Logo SEPLAN GOV PI"
-            width={220} // Ajuste de tamanho para a página de login
+            width={220}
             height={67}
             priority
           />
         </div>
 
         <div className={styles.formWrapper}>
-          {/* O título h1 foi removido para dar destaque à logo */}
           <form onSubmit={handleSubmit} className={styles.form}>
+            {/* ========================================================== */}
+            {/* CORREÇÃO APLICADA AQUI                                     */}
+            {/* O rótulo foi alterado para 'Login' e um placeholder        */}
+            {/* foi adicionado para guiar o usuário a inserir o dado       */}
+            {/* correto ('admin' em vez do e-mail).                        */}
+            {/* ========================================================== */}
             <div className={styles.inputGroup}>
-              <label htmlFor="usuario">Usuário</label>
-              <input type="text" id="usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} required disabled={isLoading} />
+              <label htmlFor="usuario">Login</label>
+              <input
+                type="text"
+                id="usuario"
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
+                required
+                disabled={isLoading}
+                placeholder="Ex: admin" // Guia visual para o usuário
+              />
             </div>
 
             <div className={styles.inputGroup}>
               <label htmlFor="senha">Senha</label>
               <div className={styles.passwordWrapper}>
-                <input type={mostrarSenha ? 'text' : 'password'} id="senha" value={senha} onChange={(e) => setSenha(e.target.value)} required disabled={isLoading} />
+                <input
+                  type={mostrarSenha ? 'text' : 'password'}
+                  id="senha"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
                 <span className={styles.eyeIcon} onClick={() => setMostrarSenha(!mostrarSenha)}>
                   {mostrarSenha ? <FiEyeOff /> : <FiEye />}
                 </span>
