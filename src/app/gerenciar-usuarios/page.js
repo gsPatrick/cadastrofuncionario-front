@@ -20,11 +20,10 @@ export default function GerenciarUsuariosPage() {
   const router = useRouter();
   const { user, isLoading: isAuthLoading } = useAuth();
 
-  // Proteção da página com base na role 'admin'
   useEffect(() => {
     if (!isAuthLoading) {
       if (!user || user.role !== 'admin') {
-        router.push('/dashboard'); // Redireciona se não for admin
+        router.push('/dashboard');
       }
     }
   }, [user, isAuthLoading, router]);
@@ -131,7 +130,6 @@ export default function GerenciarUsuariosPage() {
   if (user?.role !== 'admin') return <p style={{ textAlign: 'center', padding: '2rem' }}>Acesso Negado.</p>;
   if (error) return <p style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>Erro: {error}</p>;
 
-  // Função para renderizar um resumo das permissões
   const renderPermissionsSummary = (permissions) => {
     if (!permissions) return <span className={styles.permissionTag}>Nenhuma permissão específica</span>;
     const summary = [];
@@ -187,7 +185,10 @@ export default function GerenciarUsuariosPage() {
                 <div className={styles.tableCell} style={{width: '10%'}}>
                   <div className={styles.actionsContainer}>
                     <button className={styles.actionButton} onClick={() => handleOpenEditModal(u)} title="Editar"><FiEdit size={16} /></button>
-                    <button className={styles.actionButton} onClick={() => handleDelete(u.id)} title="Excluir"><FiTrash2 size={16} /></button>
+                    {/* Não permite que o usuário se auto-exclua */}
+                    {user?.id !== u.id && (
+                        <button className={styles.actionButton} onClick={() => handleDelete(u.id)} title="Excluir"><FiTrash2 size={16} /></button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -214,6 +215,10 @@ export default function GerenciarUsuariosPage() {
           initialData={editingUser}
           onSubmit={handleFormSubmit}
           onCancel={handleCloseModal}
+          // ==========================================================
+          // CORREÇÃO APLICADA AQUI: Passando o usuário logado para o form
+          // ==========================================================
+          currentUser={user}
         />
       </Modal>
     </main>

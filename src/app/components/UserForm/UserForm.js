@@ -18,7 +18,7 @@ const permissionMatrix = {
   }
 };
 
-const UserForm = ({ initialData = null, onSubmit, onCancel }) => {
+const UserForm = ({ initialData = null, onSubmit, onCancel, currentUser }) => {
   const [formData, setFormData] = useState({
     name: '',
     login: '',
@@ -34,10 +34,10 @@ const UserForm = ({ initialData = null, onSubmit, onCancel }) => {
   });
 
   const isEditing = !!initialData;
+  const isEditingSelf = currentUser && initialData && currentUser.id === initialData.id;
 
   useEffect(() => {
     if (initialData) {
-      // Combina as permissões default com as existentes para evitar erros
       const initialPermissions = {
         employee: { ...formData.permissions.employee, ...initialData.permissions?.employee },
         document: { ...formData.permissions.document, ...initialData.permissions?.document },
@@ -54,7 +54,6 @@ const UserForm = ({ initialData = null, onSubmit, onCancel }) => {
         permissions: initialPermissions,
       });
     } else {
-      // Reseta para um formulário limpo
       setFormData({
         name: '', login: '', email: '', password: '', role: 'rh', isActive: true,
         permissions: {
@@ -88,11 +87,34 @@ const UserForm = ({ initialData = null, onSubmit, onCancel }) => {
     }));
   };
 
+  // ==========================================================
+  // CORREÇÃO DEFINITIVA APLICADA AQUI
+  // ==========================================================
   const handleSubmit = (e) => {
     e.preventDefault();
-    const payload = { ...formData };
-    if (isEditing && !payload.password) delete payload.password;
-    if (payload.role === 'admin') delete payload.permissions; // Limpa permissões se for admin
+    
+    // 1. Começa com os campos que são sempre enviados
+    const payload = {
+      name: formData.name,
+      login: formData.login,
+      email: formData.email,
+    };
+
+    // 2. Adiciona a senha se ela foi preenchida
+    if (formData.password) {
+      payload.password = formData.password;
+    }
+
+    // 3. Adiciona os campos de permissão APENAS se não for auto-edição
+    if (!isEditingSelf) {
+      payload.role = formData.role;
+      payload.isActive = formData.isActive;
+      if (formData.role === 'rh') {
+        payload.permissions = formData.permissions;
+      }
+    }
+
+    // 4. Envia o payload limpo e correto
     onSubmit(payload);
   };
 
@@ -120,51 +142,55 @@ const UserForm = ({ initialData = null, onSubmit, onCancel }) => {
         </div>
       </fieldset>
 
-      <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Perfil e Status</legend>
-        <div className={styles.grid2Cols}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="role">Perfil de Acesso</label>
-            <select id="role" name="role" value={formData.role} onChange={handleChange}>
-              <option value="rh">RH (Permissões Customizadas)</option>
-              <option value="admin">Admin (Acesso Total)</option>
-            </select>
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="isActive">Status da Conta</label>
-            <select id="isActive" name="isActive" value={String(formData.isActive)} onChange={(e) => setFormData(p => ({...p, isActive: e.target.value === 'true'}))}>
-              <option value="true">Ativo</option>
-              <option value="false">Inativo</option>
-            </select>
-          </div>
-        </div>
-      </fieldset>
-
-      {formData.role === 'rh' && (
-        <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>Permissões Granulares (para Perfil RH)</legend>
-          <div className={styles.permissionsContainer}>
-            {Object.entries(permissionMatrix).map(([entity, config]) => (
-              <div key={entity} className={styles.permissionEntity}>
-                <strong>{config.label}</strong>
-                <div className={styles.permissionActions}>
-                  {Object.entries(config.actions).map(([action, label]) => (
-                    <div key={action} className={styles.checkboxGroup}>
-                      <input 
-                        type="checkbox" 
-                        id={`${entity}-${action}`}
-                        name={`${entity}-${action}`}
-                        checked={!!formData.permissions?.[entity]?.[action]}
-                        onChange={handlePermissionChange}
-                      />
-                      <label htmlFor={`${entity}-${action}`}>{label}</label>
-                    </div>
-                  ))}
-                </div>
+      {!isEditingSelf && (
+        <>
+          <fieldset className={styles.fieldset}>
+            <legend className={styles.legend}>Perfil e Status</legend>
+            <div className={styles.grid2Cols}>
+              <div className={styles.inputGroup}>
+                <label htmlFor="role">Perfil de Acesso</label>
+                <select id="role" name="role" value={formData.role} onChange={handleChange}>
+                  <option value="rh">RH (Permissões Customizadas)</option>
+                  <option value="admin">Admin (Acesso Total)</option>
+                </select>
               </div>
-            ))}
-          </div>
-        </fieldset>
+              <div className={styles.inputGroup}>
+                <label htmlFor="isActive">Status da Conta</label>
+                <select id="isActive" name="isActive" value={String(formData.isActive)} onChange={(e) => setFormData(p => ({...p, isActive: e.target.value === 'true'}))}>
+                  <option value="true">Ativo</option>
+                  <option value="false">Inativo</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          {formData.role === 'rh' && (
+            <fieldset className={styles.fieldset}>
+              <legend className={styles.legend}>Permissões Granulares (para Perfil RH)</legend>
+              <div className={styles.permissionsContainer}>
+                {Object.entries(permissionMatrix).map(([entity, config]) => (
+                  <div key={entity} className={styles.permissionEntity}>
+                    <strong>{config.label}</strong>
+                    <div className={styles.permissionActions}>
+                      {Object.entries(config.actions).map(([action, label]) => (
+                        <div key={action} className={styles.checkboxGroup}>
+                          <input 
+                            type="checkbox" 
+                            id={`${entity}-${action}`}
+                            name={`${entity}-${action}`}
+                            checked={!!formData.permissions?.[entity]?.[action]}
+                            onChange={handlePermissionChange}
+                          />
+                          <label htmlFor={`${entity}-${action}`}>{label}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </fieldset>
+          )}
+        </>
       )}
 
       <div className={styles.buttonContainer}>
